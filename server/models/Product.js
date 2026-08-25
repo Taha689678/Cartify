@@ -31,11 +31,21 @@ const productSchema = new mongoose.Schema(
       ref: "Seller",
       required: [true, "Seller reference is required"],
     },
-    category: {
+   categories: {
+    type: [
+    {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: [true, "Category reference is required"],
-    },
+      },
+      ],
+     required: [true, "At least one category is required"],
+     validate: {
+     validator: function (categories) {
+      return categories.length > 0;
+       },
+       message: "Product must have at least one category",
+      },
+     },
     brand: {
       type: String,
       trim: true,
@@ -96,7 +106,7 @@ const productSchema = new mongoose.Schema(
 productSchema.index({ name: "text", brand: "text", description: "text" });
 
 // Common product-discovery query patterns
-productSchema.index({ category: 1, isActive: 1 });
+productSchema.index({ categories: 1, isActive: 1 });
 productSchema.index({ seller: 1, isActive: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ isFeatured: 1, isActive: 1 });
