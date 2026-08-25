@@ -1,19 +1,6 @@
 const ApiError = require("../utils/apiError");
 
-/**
- * A "validator" accepted by this middleware can be either:
- *
- *  1. A Joi-style schema — anything with a `.validate(data, options)` method
- *     that returns `{ error, value }` (this is what Joi, and most schema
- *     libraries modeled after it, already return).
- *
- *  2. A plain function — `(data) => { errors: [...] | null, value: any }`.
- *     Useful if validators/authValidator.js (or any future validator file)
- *     is written as hand-rolled functions instead of a schema library.
- *
- * Either way, this file never assumes a specific validation library is
- * installed — it only relies on one of these two calling conventions.
- */
+
 const isJoiLikeSchema = (candidate) =>
   Boolean(candidate) && typeof candidate.validate === "function";
 
@@ -59,37 +46,6 @@ const runValidator = (validator, data) => {
   );
 };
 
-/**
- * validate(schema)
- *
- * Generic, reusable request-validation middleware.
- *
- * Usage A — validate req.body only (schema is a single Joi schema or function):
- *   router.post("/register", validate(authValidator.registerSchema), authController.register);
- *
- * Usage B — validate multiple parts of the request:
- *   router.get(
- *     "/products/:id",
- *     validate({ params: productValidator.idParamSchema }),
- *     productController.getById
- *   );
- *
- *   router.get(
- *     "/products",
- *     validate({ query: productValidator.listQuerySchema }),
- *     productController.list
- *   );
- *
- * `schema` may be:
- *   - a single Joi schema or validator function -> validates req.body only
- *   - an object like { body, params, query } -> validates whichever of
- *     those keys are supplied against the matching part of the request
- *
- * On failure: responds with 400 and a structured, safe error list.
- * On success: request continues; req.body/params/query are only
- * overwritten with the validator's own sanitized output (e.g. Joi's
- * stripped/coerced `value`), never modified in any other way.
- */
 const validate = (schema) => {
   const targets =
     isJoiLikeSchema(schema) || isValidatorFunction(schema)
