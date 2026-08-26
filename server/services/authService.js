@@ -1,13 +1,13 @@
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
-const User = require("../models/User");
-const Session = require("../models/Session");
-const Seller = require("../models/Seller");
-const tokenService = require("./tokenService");
-const emailService = require("./emailService");
-const hashToken = require("../utils/hashToken");
-const ApiError = require("../utils/apiError");
+import User from "../models/User.js";
+import Session from "../models/Session.js";
+import Seller from "../models/Seller.js";
+import tokenService from "./tokenService.js";
+import emailService from "./emailService.js";
+import hashToken from "../utils/hashToken.js";
+import ApiError from "../utils/apiError.js";
 
 const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 12;
 const REFRESH_TOKEN_TTL_MS =
@@ -434,7 +434,7 @@ const changeUserPassword = async ({ userId, currentPassword, newPassword }) => {
   await Session.deleteMany({ user: user._id });
 };
 
-module.exports = {
+export default {
   registerUser,
   loginUser,
   logoutUser,

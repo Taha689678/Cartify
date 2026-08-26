@@ -1,4 +1,4 @@
-const rateLimit = require("express-rate-limit");
+import rateLimit from "express-rate-limit";
 
 
 const rateLimitHandler = (req, res) => {
@@ -64,7 +64,7 @@ const refreshTokenLimiter = buildLimiter({
   max: Number(process.env.REFRESH_TOKEN_RATE_LIMIT_MAX) || 30,
 });
 
-module.exports = {
+export {
   loginLimiter,
   registerLimiter,
   forgotPasswordLimiter,

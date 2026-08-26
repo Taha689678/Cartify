@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const bannerSchema = new mongoose.Schema(
   {
@@ -71,4 +71,6 @@ bannerSchema.index({ startDate: 1 });
 bannerSchema.index({ endDate: 1 });
 bannerSchema.index({ sortOrder: 1 });
 
-module.exports = mongoose.model("Banner", bannerSchema);
+const Banner = mongoose.model("Banner", bannerSchema);
+
+export default Banner;

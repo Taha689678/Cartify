@@ -1,17 +1,17 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const authMiddleware = require("../middleware/authMiddleware");
-const {
+import authMiddleware from "../middleware/authMiddleware.js";
+import {
   loginLimiter,
   registerLimiter,
   forgotPasswordLimiter,
   resetPasswordLimiter,
   verificationLimiter,
   refreshTokenLimiter,
-} = require("../middleware/rateLimitMiddleware");
-const validateMiddleware = require("../middleware/validateMiddleware");
-const {
+} from "../middleware/rateLimitMiddleware.js";
+import validateMiddleware from "../middleware/validateMiddleware.js";
+import {
   register,
   login,
   forgotPassword,
@@ -22,16 +22,16 @@ const {
   refreshToken,
   getCurrentUser,
   changePassword,
-} = require("../controllers/authController");
-const {
-  register: registerValidator,
-  login: loginValidator,
-  forgotPassword: forgotPasswordValidator,
-  resetPassword: resetPasswordValidator,
-  verifyEmail: verifyEmailValidator,
-  resendVerificationEmail: resendVerificationValidator,
-  changePassword: changePasswordValidator,
-} = require("../validators/authValidator");
+} from "../controllers/authController.js";
+import {
+  register as registerValidator,
+  login as loginValidator,
+  forgotPassword as forgotPasswordValidator,
+  resetPassword as resetPasswordValidator,
+  verifyEmail as verifyEmailValidator,
+  resendVerificationEmail as resendVerificationValidator,
+  changePassword as changePasswordValidator,
+} from "../validators/authValidator.js";
 
 const attachVerifyTokenToBody = (req, res, next) => {
   if (req.query && req.query.token && !req.body?.token) {
@@ -81,4 +81,4 @@ router.post(
   changePassword
 );
 
-module.exports = router;
+export default router;

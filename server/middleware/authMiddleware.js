@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const ApiError = require("../utils/apiError");
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import ApiError from "../utils/apiError.js";
 
 /**
  * requireAuth
@@ -68,4 +68,4 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-module.exports = requireAuth;
+export default requireAuth;

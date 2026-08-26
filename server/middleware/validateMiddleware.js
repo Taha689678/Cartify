@@ -1,4 +1,4 @@
-const ApiError = require("../utils/apiError");
+import ApiError from "../utils/apiError.js";
 
 
 const isJoiLikeSchema = (candidate) =>
@@ -89,4 +89,4 @@ const validate = (schema) => {
   };
 };
 
-module.exports = validate;
+export default validate;

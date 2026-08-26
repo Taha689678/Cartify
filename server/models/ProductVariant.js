@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const productVariantSchema = new mongoose.Schema(
   {
@@ -60,4 +60,6 @@ const productVariantSchema = new mongoose.Schema(
 // Fetch all variants for a product, restricted to active ones
 productVariantSchema.index({ product: 1, isActive: 1 });
 
-module.exports = mongoose.model("ProductVariant", productVariantSchema);
+const ProductVariant = mongoose.model("ProductVariant", productVariantSchema);
+
+export default ProductVariant;

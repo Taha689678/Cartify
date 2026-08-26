@@ -1,40 +1,13 @@
-const ApiError = require("../utils/apiError");
-
-/**
- * emailService
- *
- * Sends authentication-related transactional email for Cartify:
- *   - account email verification (and resends)
- *   - password reset
- *
- * Scope boundaries (deliberate — do not widen):
- *   - This service NEVER generates a token. It receives an already-generated
- *     raw token from authService purely to build the link.
- *   - This service NEVER hashes a token. Hashing belongs to utils/hashToken.js,
- *     and only the hash is ever persisted (done in authService).
- *   - This service NEVER stores a token — no module state, no DB writes.
- *   - The raw token is used to build one URL and is then dropped. It is never
- *     logged, and never appears in any error this file throws.
- *
- * Failure policy: every send either resolves or THROWS. Nothing is swallowed
- * here, so authService keeps full control of how a delivery failure is
- * handled. Errors thrown are generic and customer-safe; the underlying SMTP
- * detail is written to the server log only and attached as `cause` for
- * server-side inspection.
- */
+import ApiError from "../utils/apiError.js";
 
 const APP_NAME = "Cartify";
 
-// Reuses the exact env var names authService already reads, so the expiry
-// quoted in the email can never drift from the expiry actually stored on the
-// User document.
 const EMAIL_VERIFICATION_TTL_MS =
   Number(process.env.EMAIL_VERIFICATION_TTL_MS) || 24 * 60 * 60 * 1000; // 24 hours
 const PASSWORD_RESET_TTL_MS =
   Number(process.env.PASSWORD_RESET_TTL_MS) || 60 * 60 * 1000; // 1 hour
 
-// Frontend routes that consume the token. Overridable so the React app can
-// move these paths without a code change here.
+
 const VERIFY_EMAIL_PATH = process.env.EMAIL_VERIFY_PATH || "/verify-email";
 const RESET_PASSWORD_PATH = process.env.PASSWORD_RESET_PATH || "/reset-password";
 
@@ -43,14 +16,7 @@ const TEXT_COLOR = "#1E293B";
 const MUTED_COLOR = "#64748B";
 const BORDER_COLOR = "#E2E8F0";
 
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
-/**
- * Logs a configuration problem by VARIABLE NAME only — never a value — then
- * throws a generic error. Mirrors the fail-safe pattern in tokenService.js.
- */
 const failConfiguration = (missingVarNames) => {
   console.error(
     `emailService: missing required environment variable(s): ${missingVarNames.join(", ")}`
@@ -58,11 +24,7 @@ const failConfiguration = (missingVarNames) => {
   throw new ApiError(500, "Email service is not configured");
 };
 
-/**
- * Escapes user-supplied text before it is interpolated into HTML. `name`
- * comes from user registration input, so without this a crafted name could
- * inject markup into the email body.
- */
+
 const escapeHtml = (value) =>
   String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -83,16 +45,7 @@ const formatDuration = (milliseconds) => {
   return `${days} day${days === 1 ? "" : "s"}`;
 };
 
-/**
- * Accepts BOTH calling conventions so this file works with the existing
- * authService.js without that file needing any change:
- *
- *   A) sendVerificationEmail(user, token)          <- documented signature
- *   B) sendVerificationEmail({ to, name, token })  <- what authService calls
- *
- * Returns { to, name, token }. Throws if a required piece is absent, since a
- * silent no-op would look like a delivered email.
- */
+
 const normalizeArgs = (userOrPayload, maybeToken, label) => {
   const source = userOrPayload || {};
 
@@ -110,16 +63,7 @@ const normalizeArgs = (userOrPayload, maybeToken, label) => {
   return { to, name, token };
 };
 
-/**
- * Builds the absolute frontend URL carrying the token.
- *
- * - Base comes from CLIENT_URL (already used elsewhere in the project).
- * - The token is URL-encoded so it survives transport intact.
- * - In production an http:// base is upgraded to https://, so a reset or
- *   verification token is never emailed over a cleartext link.
- * - A base with a sub-path (https://host/app) is preserved rather than
- *   discarded.
- */
+
 const buildActionUrl = (path, token) => {
   const base = process.env.CLIENT_URL;
   if (!base) failConfiguration(["CLIENT_URL"]);
@@ -152,19 +96,11 @@ const buildActionUrl = (path, token) => {
 // email would be wasteful. Holds configuration only; no tokens, no messages.
 let cachedTransporter = null;
 
-/**
- * Loads nodemailer lazily.
- *
- * Requiring at module top-level would make this file — and therefore
- * authService, and therefore the whole auth stack — fail to load while the
- * dependency is absent. Requiring on first send instead keeps registration
- * and login working, and confines the failure to the email step, which
- * authService already handles.
- */
-const loadMailer = () => {
+
+const loadMailer = async () => {
   try {
-    // eslint-disable-next-line global-require
-    return require("nodemailer");
+    const nodemailer = await import("nodemailer");
+    return nodemailer.default || nodemailer;
   } catch (error) {
     console.error(
       "emailService: the 'nodemailer' package is not installed — email cannot be sent until it is added as a dependency"
@@ -174,7 +110,7 @@ const loadMailer = () => {
 };
 
 /** Reads SMTP settings from the environment and builds the transporter. */
-const getTransporter = () => {
+const getTransporter = async () => {
   if (cachedTransporter) return cachedTransporter;
 
   const host = process.env.SMTP_HOST;
@@ -190,7 +126,7 @@ const getTransporter = () => {
   if (!password) missing.push("SMTP_PASSWORD");
   if (missing.length > 0) failConfiguration(missing);
 
-  const nodemailer = loadMailer();
+  const nodemailer = await loadMailer();
 
   // Implicit TLS on 465; STARTTLS elsewhere. Override with SMTP_SECURE.
   const secure =
@@ -217,15 +153,9 @@ const getFromAddress = () => {
   return configured.includes("<") ? configured : `${APP_NAME} <${configured}>`;
 };
 
-/**
- * Performs the actual send.
- *
- * On failure: logs SMTP diagnostics (never credentials, never the token or
- * the tokenised URL) and throws a generic 502 so the internal SMTP error is
- * never surfaced to a customer. authService decides what happens next.
- */
+
 const dispatch = async ({ to, subject, text, html, label }) => {
-  const transporter = getTransporter();
+  const transporter = await getTransporter();
   const from = getFromAddress();
 
   try {
@@ -245,14 +175,7 @@ const dispatch = async ({ to, subject, text, html, label }) => {
   }
 };
 
-// ---------------------------------------------------------------------------
-// Templates
-// ---------------------------------------------------------------------------
 
-/**
- * Shared responsive shell. Table-based with inline styles, because email
- * clients strip <style> blocks and ignore modern layout CSS.
- */
 const renderLayout = ({ preheader, heading, bodyHtml, ctaLabel, ctaUrl, footerHtml }) => `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -425,13 +348,7 @@ const sendVerificationEmail = async (userOrPayload, token) => {
   await dispatch({ to, subject, text, html, label: "verification" });
 };
 
-/**
- * resendVerificationEmail(user, token) — same email, resend wording.
- *
- * Provided for completeness. The existing authService.resendVerificationEmail
- * calls sendVerificationEmail directly, which is fully supported; this is an
- * optional convenience and nothing currently depends on it.
- */
+
 const resendVerificationEmail = async (userOrPayload, token) =>
   sendVerificationEmail({ ...(userOrPayload || {}), resend: true }, token);
 
@@ -456,7 +373,7 @@ const sendPasswordResetEmail = async (userOrPayload, token) => {
   await dispatch({ to, subject, text, html, label: "password reset" });
 };
 
-module.exports = {
+export default {
   sendVerificationEmail,
   resendVerificationEmail,
   sendPasswordResetEmail,

@@ -1,4 +1,4 @@
-const ApiError = require("../utils/apiError");
+import ApiError from "../utils/apiError.js";
 
 const VALID_ROLES = ["customer", "seller", "admin"];
 
@@ -40,4 +40,4 @@ const requireRole = (...allowedRoles) => {
   };
 };
 
-module.exports = requireRole;
+export default requireRole;

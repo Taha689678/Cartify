@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+import crypto from "crypto";
 const RANDOM_TOKEN_BYTES = 32;
 /**
  * Generates a cryptographically secure, URL-safe random token.
@@ -13,6 +13,4 @@ function generateRandomToken() {
   return crypto.randomBytes(RANDOM_TOKEN_BYTES).toString("base64url");
 }
 
-module.exports = {
-  generateRandomToken,
-};
+export { generateRandomToken };

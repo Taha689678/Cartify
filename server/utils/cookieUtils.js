@@ -1,8 +1,8 @@
-const {
+import {
   setAccessTokenCookie,
   setRefreshTokenCookie,
-  clearAuthCookies: clearCookies,
-} = require("./cookies");
+  clearAuthCookies as clearCookies,
+} from "./cookies.js";
 
 
 const setAuthCookies = (res, { accessToken, refreshToken }) => {
@@ -20,7 +20,7 @@ const clearAuthCookies = (res) => {
   clearCookies(res);
 };
 
-module.exports = {
+export {
   setAuthCookies,
   clearAuthCookies,
 };

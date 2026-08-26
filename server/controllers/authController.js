@@ -1,7 +1,7 @@
-const authService = require("../services/authService");
-const ApiResponse = require("../utils/apiResponse");
-const ApiError = require("../utils/apiError");
-const { setAuthCookies, clearAuthCookies } = require("../utils/cookieUtils");
+import authService from "../services/authService.js";
+import ApiResponse from "../utils/apiResponse.js";
+import ApiError from "../utils/apiError.js";
+import { setAuthCookies, clearAuthCookies } from "../utils/cookieUtils.js";
 
 /**
  * @route   POST /api/auth/register
@@ -252,7 +252,7 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   register,
   login,
   logout,

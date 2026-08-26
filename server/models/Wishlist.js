@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const wishlistSchema = new mongoose.Schema(
   {
@@ -33,4 +33,6 @@ const wishlistSchema = new mongoose.Schema(
 // Speed up checks like "is this product already in the user's wishlist"
 wishlistSchema.index({ user: 1, products: 1 });
 
-module.exports = mongoose.model("Wishlist", wishlistSchema);
+const Wishlist = mongoose.model("Wishlist", wishlistSchema);
+
+export default Wishlist;

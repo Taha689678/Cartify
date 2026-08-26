@@ -1,5 +1,4 @@
-
-const crypto = require("crypto");
+import crypto from "crypto";
 /**
  * Hashes a token using SHA-256, returning a consistent hex string.
  * The same input always produces the same output, so a stored hash
@@ -19,4 +18,4 @@ function hashToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-module.exports = hashToken;
+export default hashToken;

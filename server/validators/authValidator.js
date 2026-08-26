@@ -404,7 +404,7 @@ const refreshToken = (data = {}) => {
   };
 };
 
-module.exports = {
+export {
   register,
   login,
   forgotPassword,

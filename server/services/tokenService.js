@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const ApiError = require("../utils/apiError");
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import ApiError from "../utils/apiError.js";
 
 const JWT_ALGORITHM = "HS256";
 
@@ -98,7 +98,7 @@ const verifyRefreshToken = (token) => {
 const generateRandomToken = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
 
-module.exports = {
+export default {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,

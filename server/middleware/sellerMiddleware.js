@@ -1,5 +1,5 @@
-const Seller = require("../models/Seller");
-const ApiError = require("../utils/apiError");
+import Seller from "../models/Seller.js";
+import ApiError from "../utils/apiError.js";
 
 /**
  * requireApprovedSeller
@@ -50,4 +50,4 @@ const requireApprovedSeller = async (req, res, next) => {
   }
 };
 
-module.exports = requireApprovedSeller;
+export default requireApprovedSeller;

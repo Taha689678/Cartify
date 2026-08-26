@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema(
   {
@@ -69,4 +69,6 @@ const addressSchema = new mongoose.Schema(
 // Quickly fetch all addresses belonging to a user
 addressSchema.index({ user: 1 });
 
-module.exports = mongoose.model("Address", addressSchema);
+const Address = mongoose.model("Address", addressSchema);
+
+export default Address;

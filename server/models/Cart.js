@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const cartItemSchema = new mongoose.Schema(
   {
@@ -50,4 +50,6 @@ const cartSchema = new mongoose.Schema(
 // Speed up lookups of a product/variant within a user's cart (e.g. duplicate-item checks)
 cartSchema.index({ user: 1, "items.product": 1, "items.variant": 1 });
 
-module.exports = mongoose.model("Cart", cartSchema);
+const Cart = mongoose.model("Cart", cartSchema);
+
+export default Cart;

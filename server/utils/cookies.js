@@ -80,7 +80,7 @@ function clearAuthCookies(res) {
   });
 }
 
-module.exports = {
+export {
   setAccessTokenCookie,
   setRefreshTokenCookie,
   clearAuthCookies,
