@@ -298,7 +298,9 @@ const verifyUserEmail = async ({ token }) => {
 
   const tokenHash = hashToken(token);
 
-  const user = await User.findOne({ emailVerificationTokenHash: tokenHash });
+  const user = await User.findOne({ emailVerificationTokenHash: tokenHash }).select(
+    "+emailVerificationTokenHash +emailVerificationTokenExpiresAt"
+  );
 
   if (
     !user ||
@@ -428,10 +430,7 @@ const changeUserPassword = async ({ userId, currentPassword, newPassword }) => {
   user.password = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
   await user.save();
 
-  // Revoke every other session; only this freshly re-authenticated flow
-  // continues (the controller's active access token stays valid until it
-  // naturally expires, but every refresh token/session is invalidated so
-  // a stolen session elsewhere can no longer refresh).
+
   await Session.deleteMany({ user: user._id });
 };
 
@@ -447,9 +446,7 @@ module.exports = {
   resetUserPassword,
   changeUserPassword,
 
-  // Aliases matching the method names already called by the existing
-  // authController.js (built earlier), so that file did not need to be
-  // touched to wire up to this service. See explanation in chat.
+
   rotateRefreshToken: refreshUserToken,
   getUserById: getCurrentUser,
   verifyEmail: verifyUserEmail,

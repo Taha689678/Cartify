@@ -4,8 +4,6 @@ const IS_PRODUCTION = NODE_ENV === "production";
 
 const COOKIE_SAME_SITE = process.env.COOKIE_SAME_SITE || (IS_PRODUCTION ? "none" : "lax");
 
-// Optional cookie domain (e.g. ".cartify.com") — only set in production
-// when explicitly configured. Never hardcode a domain here.
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
 
@@ -18,8 +16,7 @@ const REFRESH_TOKEN_MAX_AGE_MS =
 const ACCESS_TOKEN_COOKIE_NAME = process.env.ACCESS_TOKEN_COOKIE_NAME || "accessToken";
 const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME || "refreshToken";
 
-// Refresh token is scoped to the endpoints that actually need it
-// (refresh + logout), reducing accidental exposure on every request.
+
 const REFRESH_TOKEN_COOKIE_PATH = process.env.REFRESH_TOKEN_COOKIE_PATH || "/api/auth";
 const ACCESS_TOKEN_COOKIE_PATH = "/";
 

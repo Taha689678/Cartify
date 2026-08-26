@@ -158,8 +158,7 @@ const resendVerificationEmail = async (req, res, next) => {
 
     await authService.resendVerificationEmail({ email });
 
-    // Always return a generic success message regardless of whether the
-    // email exists or was already verified, to avoid leaking account state.
+   
     return res
       .status(200)
       .json(
