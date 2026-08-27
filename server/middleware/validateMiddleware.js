@@ -79,7 +79,8 @@ const validate = (schema) => {
       // Only assign back what the validator explicitly returned as sanitized
       // output — request data is otherwise left completely untouched.
       Object.keys(sanitized).forEach((key) => {
-        req[key] = sanitized[key];
+        if (key === "body") req.body = sanitized.body;
+        if (key === "params") req.params = sanitized.params;
       });
 
       return next();

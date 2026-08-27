@@ -1,18 +1,22 @@
-import { AuthProvider } from "./context/AuthContext";
-import { Header } from "./components/layout/Header";
-import { Footer } from "./components/layout/Footer";
-import { HomePage } from "./pages/customer/HomePage";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { Header } from "./components/layout/Header.jsx";
+import { Footer } from "./components/layout/Footer.jsx";
+import { AppRoutes } from "./routes/AppRoutes.jsx";
 
 function App() {
   return (
     <AuthProvider>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow">
-          <HomePage />
-        </main>
-        <Footer />
-      </div>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          {/* Temporary Tailwind test - remove after verification */}
+          <Header />
+          <main className="flex-grow">
+            <AppRoutes />
+          </main>
+          <Footer />
+        </div>
+      </Router>
     </AuthProvider>
   );
 }

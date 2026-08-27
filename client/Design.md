@@ -1,9 +1,11 @@
-# Cartify — Homepage UI Design Specification
+# Cartify — Homepage & Authentication UI Design Specification
 
-This document is a complete build spec for the Cartify storefront homepage.
-It is written so that any AI assistant or developer can implement the **exact
-same design, section by section**, with modern animation, 3D accents, full
-mobile responsiveness, and proper loading states — without guessing.
+This document is a complete build spec for the Cartify storefront homepage
+**and** its authentication pages (Login, Register, Forgot Password, Reset
+Password, Email Verification). It is written so that any AI assistant or
+developer can implement the **exact same design, section by section**, with
+modern animation, 3D accents, background imagery, full mobile responsiveness,
+and proper loading states — without guessing.
 
 Reference design inspiration: GoCart (https://gocart-gs.vercel.app)
 
@@ -31,7 +33,7 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 
 ## 2. Global Design Tokens
 
-- **Corners:** `rounded-xl` / `rounded-2xl` on all cards and buttons.
+- **Corners:** `rounded-xl` / `rounded-2xl` on all cards, buttons, and inputs.
 - **Shadows:** soft, layered — `shadow-sm` at rest, `shadow-lg` on hover.
 - **Spacing:** generous — section vertical padding `py-16` to `py-24` on desktop, `py-10` on mobile.
 - **Accent color:** one primary brand color for buttons/links/badges (pick one, keep consistent — do not use more than one accent).
@@ -40,7 +42,7 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 
 ---
 
-## 3. Page Sections (in order)
+## 3. Homepage Sections (in order)
 
 ### 3.1 Top Promo Bar
 - Full-width thin bar above the navbar.
@@ -95,7 +97,7 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 
 ---
 
-## 4. 3D Guidelines (`Hero3D.jsx`)
+## 4. Homepage 3D Guidelines (`Hero3D.jsx`)
 
 - Use `@react-three/fiber`'s `<Canvas>` with `@react-three/drei`'s `<Environment>` (a simple studio/city preset) for realistic lighting without manual light rigging.
 - If no real product `.glb` model is available yet, use a simple procedural shape (e.g. `<Icosahedron>` or `<Torus>` from drei) with a nice material (`meshStandardMaterial` with `roughness`/`metalness` tuned for a premium look) as a placeholder — do not attempt to fabricate a realistic product mesh from nothing.
@@ -107,35 +109,164 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 
 ---
 
-## 5. Responsive Breakpoints
+## 5. Authentication Pages
+
+All auth pages (Login, Register, Forgot Password, Reset Password, Email
+Verification) share one visual system so the whole auth flow feels like a
+single continuous experience rather than five disconnected screens.
+
+### 5.1 Shared Auth Layout (`AuthLayout.jsx`)
+
+- **Background image:** a single full-bleed lifestyle/product photograph
+  (e.g. a soft-lit shopping/lifestyle scene) fixed behind every auth page,
+  `bg-cover bg-center`, with a dark gradient overlay
+  (`bg-gradient-to-br from-black/60 via-black/40 to-black/60`) so text and
+  the form card stay readable regardless of the underlying image.
+- **3D classic accent (`AuthBackdrop3D.jsx`):** a fixed, full-screen
+  `@react-three/fiber` canvas layered *between* the background image and the
+  form card (`z-index` order: background image → 3D canvas → gradient
+  overlay → glass form card). Renders 2–3 large, slow-floating abstract
+  shapes (e.g. `<TorusKnot>`, `<Icosahedron>`, `<Sphere>` from drei) at low
+  opacity (`transparent material, opacity ~0.25`), gently drifting up/down
+  (`useFrame` sine-wave position offset) and slowly rotating — a "classic"
+  ambient 3D effect rather than an interactive product showcase.
+  - Desaturated / monochrome material tint so it never competes with the
+    form in the foreground.
+  - Subtle parallax: shapes shift a few pixels opposite to mouse movement
+    for depth, disabled entirely on touch devices.
+- **Form card:** centered, `bg-white/90 backdrop-blur-xl rounded-2xl
+  shadow-2xl`, max width `~420px`, floats above the background image + 3D
+  layer (classic "glassmorphism over a photo" look).
+- **Entrance animation:** card fades+scales in (`opacity: 0, scale: 0.95 →
+  opacity: 1, scale: 1`, ~0.4s) on route mount; background image has a slow
+  Ken Burns-style zoom (`scale: 1 → 1.05` over 20s, `repeat: Infinity,
+  repeatType: "reverse"`) for subtle ambient motion.
+- **Mobile:** the 3D canvas is **disabled** (render only the static
+  background image + gradient overlay) to protect performance/battery —
+  the animated background image zoom still runs, since that's CSS/GPU-cheap.
+  Card becomes full-width with side padding instead of a fixed max-width.
+
+### 5.2 Login Page
+- Fields: email, password (with a show/hide toggle icon — `Eye`/`EyeOff`
+  from lucide-react), "Remember me" checkbox, "Forgot password?" link.
+- Primary CTA: "Log In" button, full width, accent color.
+- Secondary link below the card: "Don't have an account? Register".
+- **Field animation:** inputs fade+slide up in a staggered sequence
+  (`staggerChildren: 0.08`) as the card mounts.
+- **Validation feedback:** invalid field gets a red border + inline message
+  that fades in below it; on a failed login attempt, the whole card does a
+  short horizontal shake (`x: [0, -8, 8, -6, 6, 0]`, ~0.4s).
+- **Submit loading state:** button label swaps to a small spinner
+  (rotating icon) and the button becomes disabled/`opacity-70` until the
+  request resolves.
+- **Success:** brief checkmark animation on the button before navigating
+  away (scale-in checkmark replacing the spinner, ~300ms) so the transition
+  doesn't feel abrupt.
+
+### 5.3 Register Page
+- Fields: name, username, email, password, confirm password, phone
+  (optional, clearly marked).
+- **Password strength meter:** a thin animated bar beneath the password
+  field that grows and shifts color (red → amber → green) live as the user
+  types, reflecting the strong-password policy (length + character variety).
+- Terms/privacy checkbox before the submit button is enabled.
+- Same field stagger-in, validation-shake, and loading/success button
+  states as Login (5.2).
+- Secondary link: "Already have an account? Log in".
+
+### 5.4 Forgot Password Page
+- Single field: email. Deliberately the lightest page in the flow — no
+  password strength meter, no extra fields.
+- Submit button: "Send Reset Link".
+- **Success state:** the form content cross-fades out and is replaced (not
+  a separate page navigation) by a confirmation view: an animated mail/send
+  icon (a paper-plane icon that flies up-and-fades, or a mail icon with a
+  gentle pulse) + the message "If an account with that email exists, a
+  reset link has been sent" — phrased identically regardless of whether the
+  email actually exists, matching Cartify's no-enumeration policy.
+- Link back to Login remains visible throughout.
+
+### 5.5 Reset Password Page
+- Fields: new password, confirm password — same strength meter as
+  Register.
+- Loaded via the emailed link's token (token itself is not shown/editable
+  in the UI).
+- **States to design for:**
+  - Valid token → normal form as above.
+  - Expired/invalid token → the form is replaced with an error state (a
+    shake-in red "X" icon + "This reset link has expired or is invalid" +
+    a button back to Forgot Password) — never silently show a blank or
+    broken form.
+  - Successful reset → checkmark success animation + short auto-redirect
+    (with a visible 3–5s countdown) to the Login page.
+
+### 5.6 Email Verification
+
+Two distinct screens under this umbrella:
+
+- **Pending screen** (shown right after registration): animated mail icon
+  (gentle bounce/pulse loop), "Verify your email" heading, the email
+  address it was sent to, and a "Resend email" button. The resend button
+  shows a disabled countdown state (e.g. "Resend in 30s", counting down)
+  immediately after use, re-enabling with a small pop animation once the
+  cooldown ends — this prevents spam-clicking without needing any extra
+  library.
+- **Verification result screen** (landing page when the user clicks the
+  emailed link, token in the URL):
+  - Success → large animated checkmark (scale/bounce in) + "Email verified!"
+    + button to continue to Login/Dashboard.
+  - Failure/expired → animated "X" or warning icon (shake-in) +
+    explanation + a "Resend verification email" action.
+  - **Loading state while the token is being verified:** a centered
+    spinner + "Verifying your email…" — never show success/failure
+    instantly before the API call actually resolves.
+
+---
+
+## 6. Responsive Breakpoints
 
 Follow Tailwind's defaults:
 
 | Breakpoint | Width     | Behavior notes |
 |------------|-----------|----------------|
-| Base (mobile) | < 640px | Single column everywhere, hamburger nav, simplified 3D, native scroll for category strip |
+| Base (mobile) | < 640px | Single column everywhere, hamburger nav, simplified/disabled 3D, native scroll for category strip, auth 3D backdrop disabled |
 | `sm`       | ≥ 640px   | 2-column product grids begin |
-| `md`       | ≥ 768px   | Hero becomes 2-column, full nav links appear |
+| `md`       | ≥ 768px   | Hero becomes 2-column, full nav links appear, auth 3D backdrop re-enabled |
 | `lg`       | ≥ 1024px  | 3–4 column product grids, full-size 3D canvas with parallax enabled |
 | `xl`       | ≥ 1280px  | Max content width container (`max-w-7xl mx-auto`), largest spacing |
 
-**General rule:** never rely on `hover` states alone for essential info on touch devices — every hover effect (quick-view icon, "View more" reveal, etc.) must also be reachable via a normal tap/click.
+**General rule:** never rely on `hover` states alone for essential info on
+touch devices — every hover effect (quick-view icon, "View more" reveal,
+etc.) must also be reachable via a normal tap/click.
 
 ---
 
-## 6. Loading / Rendering States
+## 7. Loading / Rendering States
 
-Every section that depends on API data (products, categories) must have three explicit states — not just a spinner:
+Every section or page that depends on API data (products, categories, auth
+requests) must have explicit states — never just a spinner and never a
+silent blank screen:
 
-1. **Loading:** skeleton components matching the real layout (gray `animate-pulse` blocks for image/title/price), same grid structure as the loaded state so there's no layout shift.
-2. **Empty:** a friendly empty-state message + icon (e.g. "No products found yet") — never just a blank section.
-3. **Error:** a short error message + a "Retry" button that re-triggers the fetch.
+1. **Loading:** skeleton components matching the real layout (gray
+   `animate-pulse` blocks for image/title/price on product sections; a
+   disabled/spinner button state on forms) — same structure as the loaded
+   state so there's no layout shift.
+2. **Empty:** a friendly empty-state message + icon (e.g. "No products
+   found yet") — never just a blank section.
+3. **Error:** a short error message + a "Retry" button that re-triggers the
+   fetch (product sections), or an inline/shake validation message (forms).
+4. **Success:** a brief, explicit confirmation (checkmark animation,
+   confirmation copy) before navigating away — never an instant, jarring
+   redirect.
 
-Suggested component: `<SectionState status="loading" | "empty" | "error" | "success">` wrapping each data-driven section, so this pattern is reusable across Latest Products, Best Selling, and later pages (Shop, Category, Product Detail).
+Suggested component: `<SectionState status="loading" | "empty" | "error" |
+"success">` wrapping each data-driven homepage section, and a matching
+`<FormState status="idle" | "loading" | "error" | "success">` pattern for
+every auth form, so this is consistent and reusable across the whole app.
 
 ---
 
-## 7. Suggested Component File Structure
+## 8. Suggested Component File Structure
 
 ```
 src/
@@ -155,18 +286,49 @@ src/
       ProductCardSkeleton.jsx
       Specifications.jsx
       Newsletter.jsx
+    auth/
+      AuthLayout.jsx
+      AuthBackdrop3D.jsx
+      LoginForm.jsx
+      RegisterForm.jsx
+      ForgotPasswordForm.jsx
+      ResetPasswordForm.jsx
+      EmailVerificationPending.jsx
+      EmailVerificationResult.jsx
+      PasswordStrengthMeter.jsx
     shared/
       SectionState.jsx
+      FormState.jsx
       Skeleton.jsx
   pages/
     HomePage.jsx
+    LoginPage.jsx
+    RegisterPage.jsx
+    ForgotPasswordPage.jsx
+    ResetPasswordPage.jsx
+    VerifyEmailPage.jsx
 ```
 
 ---
 
-## 8. Implementation Notes
+## 9. Implementation Notes
 
-- This is a **Vite + React** project — do not use `next/link`, `next/image`, or any other Next.js-only API. Use `react-router-dom`'s `<Link to="...">` and plain `<img>` tags.
-- Keep 3D confined to the hero only — do not add 3D elements to every section, both for performance and so the one 3D moment stays special.
-- Every animation must respect `prefers-reduced-motion` — wrap Framer Motion variants so entrance animations still show content (just without the motion) for users with that OS setting enabled.
-- Product/category data shown in this spec is placeholder — wire each section to the real Cartify API endpoints (`productController`, `categoryController`) once the visual layer is working.
+- This is a **Vite + React** project — do not use `next/link`, `next/image`,
+  or any other Next.js-only API. Use `react-router-dom`'s `<Link to="...">`
+  and plain `<img>` tags.
+- Keep 3D confined to the homepage hero and the auth background — do not
+  add 3D elements to every section/page, both for performance and so those
+  moments stay special rather than gimmicky.
+- Every animation must respect `prefers-reduced-motion` — wrap Framer
+  Motion variants so entrance animations still show content (just without
+  the motion) for users with that OS setting enabled.
+- Product/category data shown in this spec is placeholder — wire each
+  section to the real Cartify API endpoints (`productController`,
+  `categoryController`) once the visual layer is working. Similarly, auth
+  forms should call the existing `authController` endpoints
+  (`/register`, `/login`, `/forgot-password`, `/reset-password`,
+  `/verify-email`, `/resend-verification`) already built on the backend.
+- Do not introduce a form-validation library (e.g. react-hook-form, Zod) or
+  any other new dependency beyond what's listed in Section 1 unless you
+  explicitly decide you want one — the states and validation described here
+  are achievable with plain React state.

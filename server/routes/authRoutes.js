@@ -33,16 +33,6 @@ import {
   changePassword as changePasswordValidator,
 } from "../validators/authValidator.js";
 
-const attachVerifyTokenToBody = (req, res, next) => {
-  if (req.query && req.query.token && !req.body?.token) {
-    req.body = {
-      ...(req.body || {}),
-      token: req.query.token,
-    };
-  }
-  return next();
-};
-
 router.post("/register", registerLimiter, validateMiddleware(registerValidator), register);
 router.post("/login", loginLimiter, validateMiddleware(loginValidator), login);
 router.post(
@@ -57,11 +47,10 @@ router.post(
   validateMiddleware(resetPasswordValidator),
   resetPassword
 );
-router.get(
+router.post(
   "/verify-email",
   verificationLimiter,
-  validateMiddleware({ query: verifyEmailValidator }),
-  attachVerifyTokenToBody,
+  validateMiddleware(verifyEmailValidator),
   verifyEmail
 );
 router.post(

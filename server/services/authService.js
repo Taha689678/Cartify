@@ -385,7 +385,11 @@ const resetUserPassword = async ({ token, newPassword }) => {
 
   const tokenHash = hashToken(token);
 
-  const user = await User.findOne({ passwordResetTokenHash: tokenHash });
+  const user = await User.findOne({
+    passwordResetTokenHash: tokenHash,
+  }).select(
+    "+passwordResetTokenHash +passwordResetTokenExpiresAt"
+  );
 
   if (
     !user ||

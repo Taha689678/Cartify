@@ -1,4 +1,4 @@
-import api from "../services/api";
+import api from "../services/api.js";
 
 export const authApi = {
   register: (data) => api.post("/auth/register", data),
@@ -6,7 +6,7 @@ export const authApi = {
   logout: () => api.post("/auth/logout"),
   refreshToken: () => api.post("/auth/refresh"),
   getCurrentUser: () => api.get("/auth/me"),
-  verifyEmail: (data) => api.post("/auth/verify-email", data),
+  verifyEmail: (token) => api.post("/auth/verify-email", { token }),
   resendVerificationEmail: (data) => api.post("/auth/resend-verification", data),
   forgotPassword: (data) => api.post("/auth/forgot-password", data),
   resetPassword: (data) => api.post("/auth/reset-password", data),
