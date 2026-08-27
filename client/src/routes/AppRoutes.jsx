@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleRoute } from "./RoleRoute.jsx";
 import { PublicRoute } from "./PublicRoute.jsx";
+import { StoreLayout } from "../layouts/StoreLayout.jsx";
 import { HomePage } from "../pages/customer/HomePage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
@@ -12,8 +13,10 @@ import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage.jsx";
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<HomePage />} />
+      {/* Public Routes with StoreLayout */}
+      <Route path="/" element={<StoreLayout />}>
+        <Route index element={<HomePage />} />
+      </Route>
       
       {/* Auth Routes - Public Only */}
       <Route
