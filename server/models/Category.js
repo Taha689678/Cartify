@@ -51,6 +51,13 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
+
+// Storefront: list active categories sorted by name
+categorySchema.index({ isActive: 1, name: 1 });
+
+// Hierarchy: find child categories of a parent
+categorySchema.index({ parentCategory: 1, isActive: 1 });
+
 const Category = mongoose.model("Category", categorySchema);
 
 export default Category;

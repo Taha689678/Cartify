@@ -1,5 +1,25 @@
 import mongoose from "mongoose";
 
+const productImageSchema = new mongoose.Schema(
+  {
+    url: {
+      type: String,
+      required: [true, "Image URL is required"],
+    },
+    publicId: {
+      type: String,
+      default: "",
+    },
+    alt: {
+      type: String,
+      trim: true,
+      maxlength: [200, "Alt text cannot exceed 200 characters"],
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     name: {
@@ -31,21 +51,21 @@ const productSchema = new mongoose.Schema(
       ref: "Seller",
       required: [true, "Seller reference is required"],
     },
-   categories: {
-    type: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      },
+    categories: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Category",
+        },
       ],
-     required: [true, "At least one category is required"],
-     validate: {
-     validator: function (categories) {
-      return categories.length > 0;
-       },
-       message: "Product must have at least one category",
+      required: [true, "At least one category is required"],
+      validate: {
+        validator: function (categories) {
+          return categories.length > 0;
+        },
+        message: "Product must have at least one category",
       },
-     },
+    },
     brand: {
       type: String,
       trim: true,
@@ -53,7 +73,7 @@ const productSchema = new mongoose.Schema(
       default: "",
     },
     images: {
-      type: [String],
+      type: [productImageSchema],
       default: [],
     },
     price: {
@@ -85,6 +105,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isBestSelling: {
+      type: Boolean,
+      default: false,
+    },
     rating: {
       type: Number,
       min: [0, "Rating cannot be negative"],
@@ -102,14 +126,18 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Text index for name/brand/description search
 productSchema.index({ name: "text", brand: "text", description: "text" });
 
-// Common product-discovery query patterns
+// Storefront: browse by category, seller store pages, price filtering
 productSchema.index({ categories: 1, isActive: 1 });
 productSchema.index({ seller: 1, isActive: 1 });
 productSchema.index({ price: 1 });
+
+// Homepage sections: featured / best-selling product carousels
 productSchema.index({ isFeatured: 1, isActive: 1 });
+productSchema.index({ isBestSelling: 1, isActive: 1 });
+
+// Sorting: top-rated products, newest arrivals
 productSchema.index({ rating: -1 });
 productSchema.index({ createdAt: -1 });
 

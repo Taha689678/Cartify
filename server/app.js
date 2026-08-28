@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import productRoutes  from "./routes/productRoutes.js";
 
 const app = express();
 
@@ -44,7 +46,9 @@ const healthResponse = (req, res) => {
 app.get("/health", healthResponse);
 app.get("/api/health", healthResponse);
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth",       authRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products",   productRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

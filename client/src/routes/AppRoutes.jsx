@@ -4,6 +4,8 @@ import { RoleRoute } from "./RoleRoute.jsx";
 import { PublicRoute } from "./PublicRoute.jsx";
 import { StoreLayout } from "../layouts/StoreLayout.jsx";
 import { HomePage } from "../pages/customer/HomePage.jsx";
+import { ShopPage } from "../pages/customer/ShopPage.jsx";
+import { ProductDetailsPage } from "../pages/customer/ProductDetailsPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage.jsx";
@@ -16,6 +18,8 @@ export const AppRoutes = () => {
       {/* Public Routes with StoreLayout */}
       <Route path="/" element={<StoreLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="shop" element={<ShopPage />} />
+        <Route path="product/:slug" element={<ProductDetailsPage />} />
       </Route>
       
       {/* Auth Routes - Public Only */}
