@@ -6,6 +6,7 @@ import { StoreLayout } from "../layouts/StoreLayout.jsx";
 import { HomePage } from "../pages/customer/HomePage.jsx";
 import { ShopPage } from "../pages/customer/ShopPage.jsx";
 import { ProductDetailsPage } from "../pages/customer/ProductDetailsPage.jsx";
+import { CartPage } from "../pages/customer/CartPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage.jsx";
@@ -20,6 +21,7 @@ export const AppRoutes = () => {
         <Route index element={<HomePage />} />
         <Route path="shop" element={<ShopPage />} />
         <Route path="product/:slug" element={<ProductDetailsPage />} />
+        <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
       </Route>
       
       {/* Auth Routes - Public Only */}

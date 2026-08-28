@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, ShoppingCart, Minus, Plus, Heart, CheckCircle, AlertCircle } from 'lucide-react';
+import { Star, ShoppingCart, Minus, Plus, Heart, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { useCart } from '../../context/CartContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export const ProductInfo = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+
   const rating = product.rating || 0;
   const reviews = product.numReviews || 0;
   const inStock = product.stock > 0;
@@ -22,8 +31,30 @@ export const ProductInfo = ({ product }) => {
     setQuantity(val);
   };
 
+  const handleAddToCart = async () => {
+    if (!inStock) return;
+    
+    setAdding(true);
+    setError(null);
+    setSuccess(false);
+    
+    try {
+      await addToCart(product._id, quantity);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      if (err.message === "unauthenticated") {
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.message || err.message || "Failed to add to cart");
+      }
+    } finally {
+      setAdding(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 h-full">
       <div>
         {product.categories && product.categories.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
@@ -84,45 +115,61 @@ export const ProductInfo = ({ product }) => {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100 mt-auto">
-        <div className="flex items-center justify-between border border-gray-300 rounded-xl px-4 py-3 bg-white w-full sm:w-32 flex-shrink-0">
-          <button 
-            onClick={() => handleQuantityChange(-1)} 
-            disabled={!inStock || quantity <= 1}
-            className="text-gray-500 hover:text-blue-600 disabled:opacity-50 transition-colors"
+      <div className="flex flex-col gap-4 pt-6 border-t border-gray-100 mt-auto">
+        {error && (
+          <div className="text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg flex items-center gap-2">
+            <AlertCircle size={16} /> {error}
+          </div>
+        )}
+        {success && (
+          <div className="text-green-600 text-sm font-medium bg-green-50 p-3 rounded-lg flex items-center gap-2">
+            <CheckCircle size={16} /> Added to cart successfully!
+          </div>
+        )}
+        
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex items-center justify-between border border-gray-300 rounded-xl px-4 py-3 bg-white w-full sm:w-32 flex-shrink-0">
+            <button 
+              onClick={() => handleQuantityChange(-1)} 
+              disabled={!inStock || quantity <= 1 || adding}
+              className="text-gray-500 hover:text-blue-600 disabled:opacity-50 transition-colors"
+            >
+              <Minus size={20} />
+            </button>
+            <input 
+              type="number" 
+              value={quantity} 
+              onChange={handleManualInput}
+              disabled={!inStock || adding}
+              className="w-12 text-center font-bold text-gray-900 bg-transparent focus:outline-none focus:ring-0 disabled:opacity-50" 
+              min="1" 
+              max={product.stock} 
+            />
+            <button 
+              onClick={() => handleQuantityChange(1)} 
+              disabled={!inStock || quantity >= product.stock || adding}
+              className="text-gray-500 hover:text-blue-600 disabled:opacity-50 transition-colors"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
+
+          <motion.button 
+            onClick={handleAddToCart}
+            whileTap={inStock && !adding ? { scale: 0.98 } : {}}
+            disabled={!inStock || adding}
+            className={`flex-1 font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md ${
+              success ? 'bg-green-600 hover:bg-green-700 shadow-green-200' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
+            } text-white`}
           >
-            <Minus size={20} />
-          </button>
-          <input 
-            type="number" 
-            value={quantity} 
-            onChange={handleManualInput}
-            disabled={!inStock}
-            className="w-12 text-center font-bold text-gray-900 bg-transparent focus:outline-none focus:ring-0 disabled:opacity-50" 
-            min="1" 
-            max={product.stock} 
-          />
-          <button 
-            onClick={() => handleQuantityChange(1)} 
-            disabled={!inStock || quantity >= product.stock}
-            className="text-gray-500 hover:text-blue-600 disabled:opacity-50 transition-colors"
-          >
-            <Plus size={20} />
+            {adding ? <Loader2 size={20} className="animate-spin" /> : <ShoppingCart size={20} />}
+            {adding ? 'Adding...' : success ? 'Added' : inStock ? 'Add to Cart' : 'Out of Stock'}
+          </motion.button>
+
+          <button className="p-3 border border-gray-300 rounded-xl text-gray-600 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex-shrink-0">
+            <Heart size={24} />
           </button>
         </div>
-
-        <motion.button 
-          whileTap={inStock ? { scale: 0.98 } : {}}
-          disabled={!inStock}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-200"
-        >
-          <ShoppingCart size={20} />
-          {inStock ? 'Add to Cart' : 'Out of Stock'}
-        </motion.button>
-
-        <button className="p-3 border border-gray-300 rounded-xl text-gray-600 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex-shrink-0">
-          <Heart size={24} />
-        </button>
       </div>
     </div>
   );

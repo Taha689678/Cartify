@@ -25,4 +25,14 @@ class ApiResponse {
   }
 }
 
+export const successResponse = (res, statusCode, message, data = null, meta = null) => {
+  return res.status(statusCode).json(new ApiResponse(statusCode, message, data, meta));
+};
+
+export const errorResponse = (res, statusCode, message, details = null) => {
+  const meta = details !== null && details !== undefined ? { details } : null;
+  return res.status(statusCode).json(new ApiResponse(statusCode, message, null, meta));
+};
+
+export { ApiResponse };
 export default ApiResponse;

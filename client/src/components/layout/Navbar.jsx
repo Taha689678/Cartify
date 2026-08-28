@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X, ShoppingCart, User } from "lucide-react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useCart } from "../../context/CartContext.jsx";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const { cartItemCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,19 +62,34 @@ export const Navbar = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+            <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
               <ShoppingCart size={24} />
-              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                0
-              </span>
-            </button>
-            <Link
-              to="/login"
-              className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
-            >
-              <User size={18} />
-              Login
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
             </Link>
+            
+            {user ? (
+              <div className="hidden sm:flex items-center gap-4">
+                <span className="text-sm font-medium text-gray-700">Hi, {user.name}</span>
+                <button
+                  onClick={logout}
+                  className="text-gray-500 hover:text-red-600 font-medium text-sm transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
+              >
+                <User size={18} />
+                Login
+              </Link>
+            )}
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -109,13 +128,31 @@ export const Navbar = () => {
                     {link.name}
                   </Link>
                 ))}
-                <Link
-                  to="/login"
-                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
-                >
-                  <User size={18} />
-                  Login
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/cart"
+                      className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium text-lg"
+                    >
+                      <ShoppingCart size={20} />
+                      Cart {cartItemCount > 0 && <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">{cartItemCount}</span>}
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors font-medium text-lg text-left"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    <User size={18} />
+                    Login
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
