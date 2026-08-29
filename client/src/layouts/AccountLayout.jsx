@@ -1,5 +1,5 @@
-﻿import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { User, Heart, ShoppingBag, LogOut, Settings } from "lucide-react";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { User, Heart, ShoppingBag, LogOut, Settings, MapPin } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export const AccountLayout = () => {
@@ -13,6 +13,7 @@ export const AccountLayout = () => {
 
   const navItems = [
     { name: "My Profile", path: "/profile", icon: <User size={20} /> },
+    { name: "My Addresses", path: "/addresses", icon: <MapPin size={20} /> },
     { name: "My Orders", path: "/orders", icon: <ShoppingBag size={20} /> },
     { name: "My Wishlist", path: "/wishlist", icon: <Heart size={20} /> },
     { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
