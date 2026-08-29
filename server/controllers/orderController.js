@@ -1,7 +1,17 @@
-import Order from "../models/Order.js";
+﻿import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 import Address from "../models/Address.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
+
+export const getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+    return successResponse(res, 200, "Orders retrieved successfully", { orders });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -11,21 +21,21 @@ export const createOrder = async (req, res, next) => {
     }
 
     if (!["cod", "card", "online"].includes(paymentMethod)) {
-      return res.status(400).json({ success: false, message: "Invalid payment method" });
+      return errorResponse(res, 400, "Invalid payment method");
     }
 
     if (!addressId) {
-      return res.status(400).json({ success: false, message: "Address ID is required" });
+      return errorResponse(res, 400, "Address ID is required");
     }
 
     const address = await Address.findById(addressId);
     if (!address || address.user.toString() !== req.user.id) {
-      return res.status(400).json({ success: false, message: "Invalid address" });
+      return errorResponse(res, 400, "Invalid address");
     }
 
     const cart = await Cart.findOne({ user: req.user.id });
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: "Cart is empty" });
+      return errorResponse(res, 400, "Cart is empty");
     }
 
     const orderItems = [];
@@ -34,15 +44,15 @@ export const createOrder = async (req, res, next) => {
     for (const item of cart.items) {
       const product = await Product.findById(item.product);
       if (!product) {
-        return res.status(400).json({ success: false, message: `Product ${item.product} not found` });
+        return errorResponse(res, 400, `Product ${item.product} not found`);
       }
 
       if (!product.isActive) {
-        return res.status(400).json({ success: false, message: `Product ${product.name} is not active` });
+        return errorResponse(res, 400, `Product ${product.name} is not active`);
       }
 
       if (product.stock < item.quantity) {
-        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
+        return errorResponse(res, 400, `Insufficient stock for ${product.name}`);
       }
 
       const itemPrice = product.price;
@@ -98,7 +108,7 @@ export const createOrder = async (req, res, next) => {
     cart.items = [];
     await cart.save();
 
-    return res.status(201).json({ success: true, order });
+    return successResponse(res, 201, "Order created successfully", { order });
   } catch (error) {
     next(error);
   }
@@ -108,9 +118,37 @@ export const getOrderById = async (req, res, next) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user.id });
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return errorResponse(res, 404, "Order not found");
     }
-    return res.status(200).json({ success: true, order });
+    return successResponse(res, 200, "Order retrieved successfully", { order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.id, user: req.user.id });
+    if (!order) {
+      return errorResponse(res, 404, "Order not found");
+    }
+    if (order.orderStatus !== "pending") {
+      return errorResponse(res, 400, "Order cannot be cancelled at this stage");
+    }
+    
+    order.orderStatus = "cancelled";
+    await order.save();
+
+    // Revert stock
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+    }
+
+    return successResponse(res, 200, "Order cancelled successfully", { order });
   } catch (error) {
     next(error);
   }

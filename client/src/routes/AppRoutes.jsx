@@ -11,6 +11,8 @@ import { CartPage } from "../pages/customer/CartPage.jsx";
 import { WishlistPage } from "../pages/customer/WishlistPage.jsx";
 import { ProfilePage } from "../pages/customer/ProfilePage.jsx";
 import { AddressesPage } from "../pages/customer/AddressesPage.jsx";
+import { OrdersPage } from "../pages/customer/OrdersPage.jsx";
+import { OrderDetailsPage } from "../pages/customer/OrderDetailsPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage.jsx";
@@ -36,6 +38,8 @@ export const AppRoutes = () => {
         <Route element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
           <Route path="profile" element={<ProfilePage />} />
           <Route path="addresses" element={<AddressesPage />} />
+          <Route path="orders" element={<OrdersPage />} />
+          <Route path="orders/:id" element={<OrderDetailsPage />} />
         </Route>
       </Route>
       
