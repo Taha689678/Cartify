@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Minus, Plus, Trash2, AlertCircle } from 'lucide-react';
@@ -181,12 +181,12 @@ export const CartPage = () => {
                 </div>
               </div>
 
-              <button 
-                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-md shadow-blue-200"
-                onClick={() => alert("Checkout module coming soon!")}
+              <Link 
+                to="/checkout"
+                className="block text-center w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-md shadow-blue-200"
               >
                 Proceed to Checkout
-              </button>
+              </Link>
 
               <Link to="/shop" className="block text-center text-blue-600 hover:text-blue-700 font-medium mt-4">
                 Continue Shopping

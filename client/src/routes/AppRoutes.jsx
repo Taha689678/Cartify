@@ -16,6 +16,8 @@ import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage.jsx";
 import { ForgotPasswordPage } from "../pages/auth/ForgotPasswordPage.jsx";
 import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage.jsx";
+import { CheckoutPage } from "../pages/customer/CheckoutPage.jsx";
+import { OrderConfirmationPage } from "../pages/customer/OrderConfirmationPage.jsx";
 
 export const AppRoutes = () => {
   return (
@@ -27,6 +29,8 @@ export const AppRoutes = () => {
         <Route path="product/:slug" element={<ProductDetailsPage />} />
         <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
+        <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+        <Route path="order-confirmation/:id" element={<ProtectedRoute><OrderConfirmationPage /></ProtectedRoute>} />
         
         {/* Account Routes */}
         <Route element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
