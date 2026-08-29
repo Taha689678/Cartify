@@ -1,12 +1,46 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingCart, Heart, Eye, Star, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useWishlist } from "../../context/WishlistContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export const ProductCard = ({ product }) => {
   const imageSrc = product.images && product.images.length > 0 ? product.images[0].url : null;
   const rating = product.rating || 0;
   const reviews = product.numReviews || 0;
   const compareAtPrice = product.compareAtPrice;
+  
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  
+  const isSaved = isInWishlist(product._id);
+
+  const handleWishlistToggle = async (e) => {
+    e.preventDefault(); // Prevent navigating to ProductDetails
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    setWishlistLoading(true);
+    try {
+      if (isSaved) {
+        await removeFromWishlist(product._id);
+      } else {
+        await addToWishlist(product._id);
+      }
+    } catch (error) {
+      console.error("Wishlist error", error);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -20,7 +54,7 @@ export const ProductCard = ({ product }) => {
             <img src={imageSrc} alt={product.name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-6xl text-gray-400">
-              ??
+              📦
             </div>
           )}
         </Link>
@@ -34,14 +68,24 @@ export const ProductCard = ({ product }) => {
           <Link to={`/product/${product.slug}`} className="bg-white p-3 rounded-full hover:bg-blue-600 hover:text-white transition-colors pointer-events-auto" title="Quick View">
             <Eye size={20} />
           </Link>
-          <button className="bg-white p-3 rounded-full hover:bg-blue-600 hover:text-white transition-colors pointer-events-auto" title="Add to Wishlist">
-            <Heart size={20} />
+          <button 
+            onClick={handleWishlistToggle}
+            disabled={wishlistLoading}
+            className="bg-white p-3 rounded-full hover:bg-blue-600 hover:text-white transition-colors pointer-events-auto" 
+            title="Add to Wishlist"
+          >
+            {wishlistLoading ? <Loader2 size={20} className="animate-spin text-gray-500" /> : <Heart size={20} className={isSaved ? "fill-red-500 text-red-500" : ""} />}
           </button>
         </motion.div>
 
-        {/* Wishlist Button */}
-        <button className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-red-50 hover:text-red-500 transition-colors z-10" title="Add to Wishlist">
-          <Heart size={18} />
+        {/* Wishlist Button (Top Right) */}
+        <button 
+          onClick={handleWishlistToggle}
+          disabled={wishlistLoading}
+          className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-red-50 hover:text-red-500 transition-colors z-10" 
+          title="Add to Wishlist"
+        >
+          {wishlistLoading ? <Loader2 size={18} className="animate-spin text-gray-500" /> : <Heart size={18} className={isSaved ? "fill-red-500 text-red-500" : ""} />}
         </button>
         
         {/* Stock status badge */}

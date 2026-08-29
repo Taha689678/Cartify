@@ -51,9 +51,79 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 - **Mobile:** stack text above button, center-aligned, smaller font.
 
 ### 3.2 Navbar
-- Logo (left) · Nav links: Home / Shop / About / Contact (center or left) · Cart icon with item-count badge + Login button (right).
-- **Animation:** background goes from transparent to `bg-white/80 backdrop-blur-md shadow-sm` once scrolled past ~40px (glassmorphism effect).
-- **Mobile:** collapse nav links into a hamburger menu; slide-in drawer from the right using Framer Motion (`AnimatePresence` + `x: "100%" → x: 0`).
+
+Cartify is a multi-vendor, multi-category marketplace, not a single-brand
+store — the navbar has to support search-first shopping, category
+discovery across multiple categories per product, and role-aware account
+states (guest / customer / seller-pending / seller-approved). "Home / Shop /
+About / Contact" (a single-brand template default) is not sufficient on its
+own; About/Contact move to the footer (see 3.10) so the navbar's space goes
+entirely to shopping actions.
+
+**Structure, left to right:**
+1. **Logo** (left).
+2. **Categories mega-menu** (`CategoryMegaMenu.jsx`) — a "Categories" or
+   "All Categories" trigger that opens a dropdown/panel on hover (desktop)
+   or tap (mobile/tablet), listing top-level categories from the
+   `Category` model, each optionally expanding to subcategories in columns.
+   This is the single most important nav element, since it's how users
+   discover products across Cartify's multi-category structure.
+3. **Search bar** (`SearchBar.jsx`) — wide, prominent, ideally the visual
+   center of the navbar. Optional attached category-filter dropdown
+   ("All Categories ▾") to scope a search, matching the Amazon/Daraz
+   pattern. This is the primary discovery method on a marketplace — give
+   it more visual weight than any single nav link.
+4. **Wishlist icon** — heart icon with a small item-count badge (backed by
+   the existing `Wishlist` model).
+5. **Cart icon** — bag icon with item-count badge.
+6. **Account menu** (`AccountMenu.jsx`) — role-aware, not a static "Login"
+   button once authenticated:
+   - **Guest (not logged in):** "Login / Register" button.
+   - **Customer:** avatar/name trigger → dropdown with My Orders, My
+     Wishlist, My Addresses, Change Password, Logout.
+   - **Seller — `Seller.status !== "approved"`:** same dropdown, but shows
+     "Seller Application: Pending/Rejected" instead of a live dashboard
+     link — never show seller tools to an unapproved seller account.
+   - **Seller — `role: "seller"` AND `Seller.status === "approved"`:** same
+     dropdown, plus a distinct "Seller Dashboard" link/button.
+
+**Optional secondary elements:**
+- A thin **top bar** above the main navbar (promo message, "Sell on
+  Cartify" link, Track Order / Help link) — same slide-down entrance
+  pattern as the existing Top Promo Bar (3.1); the two can be combined into
+  one bar rather than stacking two thin bars.
+- The existing **Category Strip** (3.5) still has a place directly under
+  the navbar as a one-click shortcut row — it's a complement to the
+  mega-menu, not a replacement: the mega-menu is for deliberate browsing,
+  the strip is for fast, no-thought access to top categories from the
+  homepage specifically.
+
+**Animation:** background goes from transparent to `bg-white/80
+backdrop-blur-md shadow-sm` once scrolled past ~40px (glassmorphism
+effect). Mega-menu panel: fade+slide-down on open (`opacity: 0, y: -8 →
+opacity: 1, y: 0`, ~0.2s), fade out on close — no bounce, this should feel
+instant and utilitarian, not playful.
+
+**Mobile:**
+- Collapse the categories mega-menu and account menu into a hamburger →
+  slide-in drawer from the right (`AnimatePresence` + `x: "100%" → x: 0`),
+  same mechanism as before.
+- **Do not hide search behind the hamburger** — keep a visible search icon
+  or persistent compact search bar in the collapsed top bar at all times;
+  search is the primary mobile action on a marketplace, not a secondary one.
+- Consider a **bottom tab bar** (Home / Categories / Cart / Account) as an
+  addition alongside the top navbar on small screens — a common, proven
+  pattern on marketplace apps (Daraz, Amazon) that keeps core actions
+  reachable with the thumb without repeatedly scrolling back to the top.
+
+**Seller dashboard layout — a deliberate, separate decision:** once a user
+is inside the seller dashboard (Products, Orders, Analytics, Payouts),
+do **not** reuse this customer-facing `Navbar.jsx`. Real marketplaces
+(Daraz, Amazon Seller Central) use a distinct `SellerLayout.jsx` with its
+own nav/link set — this keeps the customer storefront's navbar focused and
+avoids awkwardly cramming two different jobs into one component. This spec
+covers the customer-facing navbar only; the seller layout is a separate
+spec to write once the seller dashboard UI is being built.
 
 ### 3.3 Hero Section
 - **Desktop:** two columns.
@@ -92,7 +162,13 @@ npm install framer-motion three @react-three/fiber @react-three/drei lucide-reac
 - **Animation:** button `whileHover={{ scale: 1.05 }}`, `whileTap={{ scale: 0.97 }}`; on successful submit, a brief success checkmark animation (scale+fade in) replaces the button label.
 
 ### 3.10 Footer
-- Brand blurb + social icons + 3 link columns (Products / Website / Contact) + copyright line.
+- Brand blurb + social icons + 3 link columns + copyright line.
+- Since About and Contact were moved out of the main navbar (see 3.2), they
+  belong here: e.g. **Company** (About, Careers, Sell on Cartify), **Help**
+  (Contact, Track Order, Returns & Refunds, FAQ), **Legal** (Privacy
+  Policy, Terms of Service) — replacing the previous generic "Products /
+  Website / Contact" column set with categories that actually fit a
+  marketplace's footer.
 - Static — no animation needed. Social icons: `whileHover={{ scale: 1.15 }}` only.
 
 ---
@@ -274,7 +350,11 @@ src/
     layout/
       TopPromoBar.jsx
       Navbar.jsx
+      CategoryMegaMenu.jsx
+      SearchBar.jsx
+      AccountMenu.jsx
       MobileNavDrawer.jsx
+      MobileBottomTabBar.jsx
       Footer.jsx
     home/
       Hero.jsx

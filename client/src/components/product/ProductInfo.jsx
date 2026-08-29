@@ -1,7 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Minus, Plus, Heart, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useCart } from '../../context/CartContext.jsx';
+import { useWishlist } from '../../context/WishlistContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
 export const ProductInfo = ({ product }) => {
@@ -9,9 +11,34 @@ export const ProductInfo = ({ product }) => {
   const [adding, setAdding] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   
   const { addToCart } = useCart();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const isSaved = isInWishlist(product._id);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    setWishlistLoading(true);
+    try {
+      if (isSaved) {
+        await removeFromWishlist(product._id);
+      } else {
+        await addToWishlist(product._id);
+      }
+    } catch (err) {
+      console.error("Wishlist error", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   const rating = product.rating || 0;
   const reviews = product.numReviews || 0;
@@ -166,8 +193,17 @@ export const ProductInfo = ({ product }) => {
             {adding ? 'Adding...' : success ? 'Added' : inStock ? 'Add to Cart' : 'Out of Stock'}
           </motion.button>
 
-          <button className="p-3 border border-gray-300 rounded-xl text-gray-600 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex-shrink-0">
-            <Heart size={24} />
+          <button 
+            onClick={handleWishlistToggle}
+            disabled={wishlistLoading}
+            className={`p-3 border rounded-xl transition-all flex-shrink-0 ${
+              isSaved 
+                ? 'border-red-200 bg-red-50 text-red-500' 
+                : 'border-gray-300 text-gray-600 hover:text-red-500 hover:border-red-200 hover:bg-red-50'
+            }`}
+            title={isSaved ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            {wishlistLoading ? <Loader2 size={24} className="animate-spin text-gray-500" /> : <Heart size={24} className={isSaved ? "fill-red-500" : ""} />}
           </button>
         </div>
       </div>

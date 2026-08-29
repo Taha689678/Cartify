@@ -1,18 +1,18 @@
-﻿import Cart from "../models/Cart.js";
+import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 // GET /api/cart
 export const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id }).populate({
+    let cart = await Cart.findOne({ user: req.user.id }).populate({
       path: "items.product",
       select: "name images price stock seller isActive",
       populate: { path: "seller", select: "storeName storeSlug" }
     });
 
     if (!cart) {
-      cart = await Cart.create({ user: req.user._id, items: [] });
+      cart = await Cart.create({ user: req.user.id, items: [] });
     }
 
     // Filter out items where the product was deleted or is inactive, if necessary.
@@ -44,9 +44,9 @@ export const addToCart = async (req, res) => {
       return errorResponse(res, 404, "Product not found or inactive");
     }
 
-    let cart = await Cart.findOne({ user: req.user._id });
+    let cart = await Cart.findOne({ user: req.user.id });
     if (!cart) {
-      cart = await Cart.create({ user: req.user._id, items: [] });
+      cart = await Cart.create({ user: req.user.id, items: [] });
     }
 
     const existingItemIndex = cart.items.findIndex(
@@ -105,7 +105,7 @@ export const updateCartItem = async (req, res) => {
       return errorResponse(res, 400, `Cannot exceed available stock (${product.stock})`);
     }
 
-    const cart = await Cart.findOne({ user: req.user._id });
+    const cart = await Cart.findOne({ user: req.user.id });
     if (!cart) {
       return errorResponse(res, 404, "Cart not found");
     }
@@ -138,7 +138,7 @@ export const updateCartItem = async (req, res) => {
 export const removeCartItem = async (req, res) => {
   try {
     const { productId } = req.params;
-    const cart = await Cart.findOne({ user: req.user._id });
+    const cart = await Cart.findOne({ user: req.user.id });
     
     if (!cart) {
       return errorResponse(res, 404, "Cart not found");

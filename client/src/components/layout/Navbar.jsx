@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Menu, X, ShoppingCart, User } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ShoppingBag, Menu, ShoppingCart, Heart, Search } from "lucide-react";
 import { useCart } from "../../context/CartContext.jsx";
+import { useWishlist } from "../../context/WishlistContext.jsx";
+import { CategoryMegaMenu } from "./CategoryMegaMenu.jsx";
+import { SearchBar } from "./SearchBar.jsx";
+import { AccountMenu } from "./AccountMenu.jsx";
+import { MobileNavDrawer } from "./MobileNavDrawer.jsx";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [mobileSearchTerm, setMobileSearchTerm] = useState("");
+  
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const { cartItemCount } = useCart();
+  const { wishlistItemCount } = useWishlist();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,155 +29,111 @@ export const Navbar = () => {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsMobileSearchOpen(false);
   }, [location]);
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Shop", path: "/shop" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-  ];
+  const handleMobileSearch = (e) => {
+    e.preventDefault();
+    if (mobileSearchTerm.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(mobileSearchTerm.trim())}`);
+      setMobileSearchTerm("");
+      setIsMobileSearchOpen(false);
+    }
+  };
 
   return (
-    <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <ShoppingBag className="text-blue-600" size={32} />
-            <span className="text-xl font-bold text-gray-900">Cartify</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-              <ShoppingCart size={24} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
+    <>
+      <nav
+        className={`sticky top-0 z-40 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/90 backdrop-blur-md shadow-sm py-2"
+            : "bg-white py-3 border-b border-gray-100"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* 1. Logo */}
+            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+              <ShoppingBag className="text-blue-600" size={28} />
+              <span className="text-xl md:text-2xl font-black tracking-tight text-gray-900">Cartify</span>
             </Link>
-            
-            {user ? (
-              <div className="hidden sm:flex items-center gap-4">
-                <span className="text-sm font-medium text-gray-700">Hi, {user.name}</span>
-                <button
-                  onClick={logout}
-                  className="text-gray-500 hover:text-red-600 font-medium text-sm transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
-              >
-                <User size={18} />
-                Login
-              </Link>
-            )}
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="md:hidden fixed inset-y-0 right-0 w-64 bg-white shadow-xl z-50"
-          >
-            <div className="p-6">
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="absolute top-4 right-4 p-2 text-gray-600 hover:text-blue-600"
-              >
-                <X size={24} />
-              </button>
-              <div className="mt-8 flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium text-lg"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                {user ? (
-                  <>
-                    <Link
-                      to="/cart"
-                      className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium text-lg"
-                    >
-                      <ShoppingCart size={20} />
-                      Cart {cartItemCount > 0 && <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">{cartItemCount}</span>}
-                    </Link>
-                    <button
-                      onClick={logout}
-                      className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors font-medium text-lg text-left"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    <User size={18} />
-                    Login
-                  </Link>
-                )}
-              </div>
+            {/* 2. Category Mega Menu */}
+            <div className="ml-8 hidden md:block">
+              <CategoryMegaMenu />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="md:hidden fixed inset-0 bg-black/50 z-40"
-          />
-        )}
-      </AnimatePresence>
-    </nav>
+            {/* 3. Search Bar (Desktop) */}
+            <SearchBar />
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-2 md:gap-6 flex-shrink-0 ml-auto">
+              {/* Mobile Search Toggle */}
+              <button
+                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                <Search size={24} />
+              </button>
+
+              {/* 4. Wishlist Icon */}
+              <Link to="/wishlist" className="relative p-2 text-gray-600 hover:text-red-500 transition-colors hidden sm:block">
+                <Heart size={24} />
+                {wishlistItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                    {wishlistItemCount > 99 ? '99+' : wishlistItemCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* 5. Cart Icon */}
+              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                <ShoppingCart size={24} />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
+              
+              {/* 6. Account Menu */}
+              <AccountMenu />
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors ml-1"
+              >
+                <Menu size={24} />
+              </button>
+            </div>
+          </div>
+          
+          {/* Mobile Search Expandable Bar */}
+          {isMobileSearchOpen && (
+            <div className="md:hidden pt-3 pb-1 w-full animate-in slide-in-from-top-2">
+              <form onSubmit={handleMobileSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={mobileSearchTerm}
+                  onChange={(e) => setMobileSearchTerm(e.target.value)}
+                  className="w-full pl-4 pr-10 py-2.5 bg-gray-100 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  autoFocus
+                />
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Search size={20} />
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      <MobileNavDrawer 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
+    </>
   );
 };

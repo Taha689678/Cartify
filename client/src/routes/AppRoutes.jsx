@@ -3,10 +3,13 @@ import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleRoute } from "./RoleRoute.jsx";
 import { PublicRoute } from "./PublicRoute.jsx";
 import { StoreLayout } from "../layouts/StoreLayout.jsx";
+import { AccountLayout } from "../layouts/AccountLayout.jsx";
 import { HomePage } from "../pages/customer/HomePage.jsx";
 import { ShopPage } from "../pages/customer/ShopPage.jsx";
 import { ProductDetailsPage } from "../pages/customer/ProductDetailsPage.jsx";
 import { CartPage } from "../pages/customer/CartPage.jsx";
+import { WishlistPage } from "../pages/customer/WishlistPage.jsx";
+import { ProfilePage } from "../pages/customer/ProfilePage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { RegisterPage } from "../pages/auth/RegisterPage.jsx";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage.jsx";
@@ -22,6 +25,12 @@ export const AppRoutes = () => {
         <Route path="shop" element={<ShopPage />} />
         <Route path="product/:slug" element={<ProductDetailsPage />} />
         <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
+        
+        {/* Account Routes */}
+        <Route element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
       </Route>
       
       {/* Auth Routes - Public Only */}

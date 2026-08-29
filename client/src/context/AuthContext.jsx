@@ -1,43 +1,46 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { authApi } from "../api/authApi";
 
 const AuthContext = createContext(null);
+const getUserFromResponse = (response) => response.data?.data?.user ?? null;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(null);
+  const hasCheckedAuth = useRef(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await authApi.getCurrentUser();
-      setUser(response.data.user);
+      setUser(getUserFromResponse(response));
       setIsAuthenticated(true);
       setError(null);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
-      // Don't set error on initial auth check - this is expected for unauthenticated users
       if (error.response && error.response.status !== 401) {
         setError(error.response?.data?.message || "Authentication check failed");
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+    checkAuth();
+  }, [checkAuth]);
 
   const refreshUser = async () => {
     try {
       const response = await authApi.getCurrentUser();
-      setUser(response.data.user);
+      setUser(getUserFromResponse(response));
       setIsAuthenticated(true);
       setError(null);
-      return response.data.user;
+      return getUserFromResponse(response);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
@@ -49,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authApi.login(credentials);
-      setUser(response.data.user);
+      setUser(getUserFromResponse(response));
       setIsAuthenticated(true);
       setError(null);
       return response.data;
@@ -75,15 +78,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    setError(null);
+
     try {
       await authApi.logout();
-    } catch (error) {
-      // Continue with logout even if API call fails
-      console.error("Logout API call failed:", error);
-    } finally {
-      setUser(null);
-      setIsAuthenticated(false);
-      setError(null);
+    } catch {
+      return;
     }
   };
 
