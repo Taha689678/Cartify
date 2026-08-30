@@ -83,7 +83,7 @@ export const CategoryMegaMenu = () => {
                 onClick={() => setIsOpen(false)}
                 className="text-blue-600 hover:text-blue-700 font-medium text-sm flex justify-center w-full hover:underline"
               >
-                Browse All Products &rarr;
+                Browse All Categories & Products &rarr;
               </Link>
             </div>
           </motion.div>

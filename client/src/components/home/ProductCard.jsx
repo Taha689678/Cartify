@@ -51,7 +51,7 @@ export const ProductCard = ({ product }) => {
       <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           {imageSrc ? (
-            <img src={imageSrc} alt={product.name} className="w-full h-full object-cover" />
+            <img src={imageSrc} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-6xl text-gray-400">
               📦

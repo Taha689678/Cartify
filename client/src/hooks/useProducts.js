@@ -13,7 +13,15 @@ export const useProducts = (initialParams = {}) => {
       setLoading(true);
       setError(null);
       const response = await productApi.getAll(currentParams);
-      setProducts(response.data.data.products);
+      if (currentParams.page > 1) {
+        setProducts(prev => {
+          // Prevent duplicates if react strict mode double fires
+          const newProducts = response.data.data.products.filter(p => !prev.some(existing => existing._id === p._id));
+          return [...prev, ...newProducts];
+        });
+      } else {
+        setProducts(response.data.data.products);
+      }
       setMeta(response.data.meta);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products. Please try again later.");

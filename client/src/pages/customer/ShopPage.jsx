@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -86,10 +86,9 @@ export const ShopPage = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = useCallback((newPage) => {
     updateFilters({ page: newPage, preservePage: true });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [searchParams]);
 
   const activeFilterCount = Array.from(searchParams.keys()).filter(k => k !== 'page' && k !== 'sort' && k !== 'limit').length;
 
@@ -176,6 +175,29 @@ export const ShopPage = () => {
       )}
     </div>
   );
+
+  const observerRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && meta && meta.page < meta.totalPages && !loading) {
+          handlePageChange(meta.page + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+    
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [meta, loading, handlePageChange]);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
@@ -284,58 +306,16 @@ export const ShopPage = () => {
                 </button>
               }
             />
-          </div>
-
-          {/* Pagination */}
-          {!loading && !error && meta && meta.totalPages > 1 && (
-            <div className="mt-8 flex justify-center items-center gap-2">
-              <button
-                onClick={() => handlePageChange(meta.page - 1)}
-                disabled={meta.page === 1}
-                className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              
-              <div className="flex items-center gap-1">
-                {[...Array(meta.totalPages)].map((_, i) => {
-                  const pageNumber = i + 1;
-                  // Show current, first, last, and pages adjacent to current
-                  if (
-                    pageNumber === 1 || 
-                    pageNumber === meta.totalPages ||
-                    (pageNumber >= meta.page - 1 && pageNumber <= meta.page + 1)
-                  ) {
-                    return (
-                      <button
-                        key={pageNumber}
-                        onClick={() => handlePageChange(pageNumber)}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                          meta.page === pageNumber 
-                            ? 'bg-blue-600 text-white' 
-                            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {pageNumber}
-                      </button>
-                    );
-                  } else if (
-                    pageNumber === meta.page - 2 || 
-                    pageNumber === meta.page + 2
-                  ) {
-                    return <span key={pageNumber} className="text-gray-400 px-1">...</span>;
-                  }
-                  return null;
-                })}
+          </div>          {/* Infinite Scroll Trigger */}
+          {meta && meta.page < meta.totalPages && (
+            <div 
+              className="w-full flex justify-center py-12"
+              ref={observerRef}
+            >
+              <div className="flex gap-3 items-center text-blue-600 bg-blue-50 px-6 py-3 rounded-full">
+                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-medium text-sm">Loading more products...</span>
               </div>
-
-              <button
-                onClick={() => handlePageChange(meta.page + 1)}
-                disabled={meta.page === meta.totalPages}
-                className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
             </div>
           )}
         </div>
@@ -343,3 +323,7 @@ export const ShopPage = () => {
     </div>
   );
 };
+
+
+
+
