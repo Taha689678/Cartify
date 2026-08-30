@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { User, LogOut, ChevronDown, Package, Heart, MapPin, Key, LayoutDashboard, FileText } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -36,7 +36,7 @@ export const AccountMenu = () => {
   }
 
   const isSeller = user.role === "seller" || user.role === "admin";
-  const sellerStatus = user.sellerStatus || "pending"; // Fallback if schema doesn't have it explicitly yet
+  const sellerStatus = user?.seller?.status || user.sellerStatus || "pending"; // Fallback if schema doesn't have it explicitly yet
 
   return (
     <div className="relative hidden md:block" ref={dropdownRef}>
@@ -118,3 +118,4 @@ export const AccountMenu = () => {
     </div>
   );
 };
+

@@ -1,4 +1,4 @@
-import crypto from "crypto";
+﻿import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
 import User from "../models/User.js";
@@ -20,7 +20,7 @@ const REQUIRE_EMAIL_VERIFICATION =
   process.env.REQUIRE_EMAIL_VERIFICATION !== "false"; // default: required
 
 // ---------------------------------------------------------------------------
-// Internal helpers (not exported — implementation details of this service)
+// Internal helpers (not exported â€” implementation details of this service)
 // ---------------------------------------------------------------------------
 
 /** Strips password and any sensitive fields before data ever leaves this service. */
@@ -44,7 +44,7 @@ const generateSecureToken = (bytes = 32) =>
 
 /**
  * Builds a new refresh token bound to a specific session.
- * Format: "<sessionId>.<secret>" — the sessionId lets refresh/logout look
+ * Format: "<sessionId>.<secret>" â€” the sessionId lets refresh/logout look
  * the session up directly by _id (fast, indexed), while only the hash of
  * the secret half is ever stored, so a stolen DB row can't be replayed.
  */
@@ -80,7 +80,7 @@ const issueAccessToken = (user) =>
 // ---------------------------------------------------------------------------
 const registerUser = async ({ name, username, email, password, phone }) => {
   // NOTE: this function intentionally does not accept a `role` argument at
-  // all, anywhere in its signature — that's what makes self-registration as
+  // all, anywhere in its signature â€” that's what makes self-registration as
   // admin structurally impossible, not just a runtime check. The User model
   // itself defaults role to "customer".
   if (!name || !username || !email || !password) {
@@ -118,7 +118,7 @@ const registerUser = async ({ name, username, email, password, phone }) => {
   await user.save();
 
   // Best-effort: registration should still succeed even if the email
-  // provider has a transient failure — the user can request a resend.
+  // provider has a transient failure â€” the user can request a resend.
   try {
     await emailService.sendVerificationEmail({
       to: user.email,
@@ -144,7 +144,7 @@ const loginUser = async ({ email, password, userAgent, ipAddress }) => {
   const normalizedEmail = email.toLowerCase().trim();
 
   // Generic message on purpose: never reveal whether the email exists or
-  // the password was wrong — both fail identically.
+  // the password was wrong â€” both fail identically.
   const invalidCredentialsError = new ApiError(401, "Invalid email or password");
 
   const user = await User.findOne({ email: normalizedEmail }).select("+password");
@@ -181,7 +181,19 @@ const loginUser = async ({ email, password, userAgent, ipAddress }) => {
 
   const accessToken = issueAccessToken(user);
 
-  return { user: toSafeUser(user), accessToken, refreshToken };
+    const safeUser = toSafeUser(user);
+  if (user.role === 'seller') {
+    const seller = await Seller.findOne({ user: user._id }).select('storeName storeSlug status');
+    if (seller) {
+      safeUser.seller = {
+        id: seller._id.toString(),
+        storeName: seller.storeName,
+        storeSlug: seller.storeSlug,
+        status: seller.status,
+      };
+    }
+  }
+  return { user: safeUser, accessToken, refreshToken };
 };
 
 // ---------------------------------------------------------------------------
@@ -191,7 +203,7 @@ const logoutUser = async ({ refreshToken, userId }) => {
   const parsed = parseRefreshToken(refreshToken);
 
   // Logout is idempotent and never trusts a bare client-supplied session
-  // ID — the only thing that identifies "which session" is the refresh
+  // ID â€” the only thing that identifies "which session" is the refresh
   // token itself (sessionId + secret), optionally scoped further to the
   // currently authenticated user for defense in depth.
   if (!parsed) return;
@@ -225,7 +237,7 @@ const refreshUserToken = async ({ refreshToken, userAgent, ipAddress }) => {
 
   if (providedHash !== session.refreshTokenHash) {
     // The session exists and isn't expired, but the secret doesn't match
-    // the currently-valid one — this is the signature of a rotated-out
+    // the currently-valid one â€” this is the signature of a rotated-out
     // (already-used) refresh token being replayed. Treat the whole
     // session as compromised and revoke it immediately.
     await Session.deleteOne({ _id: session._id });
@@ -326,7 +338,7 @@ const resendVerificationEmail = async ({ email }) => {
   const user = await User.findOne({ email: email.toLowerCase().trim() });
 
   // Silently do nothing if the account doesn't exist or is already
-  // verified — the controller returns the same generic message regardless.
+  // verified â€” the controller returns the same generic message regardless.
   if (!user || user.isVerified) return;
 
   const verificationSecret = generateSecureToken(32);
@@ -355,7 +367,7 @@ const requestPasswordReset = async ({ email }) => {
 
   const user = await User.findOne({ email: email.toLowerCase().trim() });
 
-  // Deliberately silent no-op if the account doesn't exist — this is what
+  // Deliberately silent no-op if the account doesn't exist â€” this is what
   // prevents forgot-password from being used to enumerate accounts.
   if (!user) return;
 
@@ -406,7 +418,7 @@ const resetUserPassword = async ({ token, newPassword }) => {
   await user.save();
 
   // A password reset is a strong signal the account may have been
-  // compromised — log every existing session out, everywhere.
+  // compromised â€” log every existing session out, everywhere.
   await Session.deleteMany({ user: user._id });
 };
 
