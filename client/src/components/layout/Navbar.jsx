@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Menu, ShoppingCart, Heart, Search } from "lucide-react";
 import { useCart } from "../../context/CartContext.jsx";
@@ -7,6 +7,7 @@ import { CategoryMegaMenu } from "./CategoryMegaMenu.jsx";
 import { SearchBar } from "./SearchBar.jsx";
 import { AccountMenu } from "./AccountMenu.jsx";
 import { MobileNavDrawer } from "./MobileNavDrawer.jsx";
+import logo from "../../assets/logo.jpeg";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -54,8 +55,7 @@ export const Navbar = () => {
           <div className="flex items-center justify-between">
             {/* 1. Logo */}
             <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-              <ShoppingBag className="text-blue-600" size={28} />
-              <span className="text-xl md:text-2xl font-black tracking-tight text-gray-900">Cartify</span>
+              <img src={logo} alt="Cartify" className="h-8 w-auto" />
             </Link>
 
             {/* 2. Category Mega Menu */}
@@ -137,3 +137,5 @@ export const Navbar = () => {
     </>
   );
 };
+
+
