@@ -1,7 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingBag, CheckCircle, Lock } from "lucide-react";
+import { CheckCircle, Lock } from "lucide-react";
+import logo from "../../assets/logo.jpeg";
 import { useForm } from "../../hooks/useForm.js";
 import { authApi } from "../../api/authApi.js";
 import { Button } from "../../components/common/Button.jsx";
@@ -54,9 +55,7 @@ export const ForgotPasswordPage = () => {
         className="bg-white p-8 sm:p-10 rounded-2xl shadow-lg w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <Lock className="text-white" size={32} />
-          </div>
+          <Link to="/" className="inline-block mb-4"><img src={logo} alt="Cartify" className="h-16 w-auto mx-auto" /></Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Forgot Password</h1>
           <p className="text-gray-600">Enter your email to receive a password reset link</p>
         </div>
@@ -120,3 +119,4 @@ export const ForgotPasswordPage = () => {
     </div>
   );
 };
+

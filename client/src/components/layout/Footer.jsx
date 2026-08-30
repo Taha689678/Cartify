@@ -1,5 +1,6 @@
-import { ShoppingBag, Globe, MessageCircle, Share2, Mail } from "lucide-react";
+﻿import { ShoppingBag, Globe, MessageCircle, Share2, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "../../assets/logo.jpeg";
 import { motion } from "framer-motion";
 
 export const Footer = () => {
@@ -9,10 +10,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="text-blue-500" size={32} />
-              <span className="text-2xl font-black tracking-tight">Cartify</span>
-            </div>
+            <Link to="/" className="flex items-center gap-2"><img src={logo} alt="Cartify" className="h-8 w-auto" /></Link>
             <p className="text-gray-400 leading-relaxed">
               Your premium destination for quality products across all categories. Shop with confidence on a trusted multi-vendor marketplace.
             </p>
@@ -78,3 +76,6 @@ export const Footer = () => {
     </footer>
   );
 };
+
+
+

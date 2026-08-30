@@ -1,7 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Package, ShoppingCart, Store, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
+import logo from "../assets/logo.jpeg";
 
 export const SellerLayout = () => {
   const { logout } = useAuth();
@@ -46,11 +47,7 @@ export const SellerLayout = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
-          <Link to="/seller/dashboard" className="text-xl font-bold text-indigo-600">
-            Cartify Seller
-          </Link>
-        </div>
+        <div className="h-16 flex items-center px-6 border-b border-gray-200"><Link to="/seller/dashboard" className="flex items-center gap-2"><img src={logo} alt="Cartify" className="h-8 w-auto" /><span className="text-xl font-bold text-indigo-600">Seller</span></Link></div>
 
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavLinks />
@@ -126,3 +123,5 @@ export const SellerLayout = () => {
     </div>
   );
 };
+
+
