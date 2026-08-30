@@ -50,4 +50,22 @@ const requireApprovedSeller = async (req, res, next) => {
   }
 };
 
+export const requireSeller = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "seller") {
+      return next(new ApiError(403, "Access denied. Seller role required."));
+    }
+
+    const seller = await Seller.findOne({ user: req.user.id });
+    if (!seller) {
+      return next(new ApiError(403, "Seller profile not found."));
+    }
+
+    req.sellerId = seller._id.toString();
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default requireApprovedSeller;

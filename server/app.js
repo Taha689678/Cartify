@@ -12,6 +12,7 @@ import addressRoutes from "./routes/addressRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import sellerRoutes from "./routes/sellerRoutes.js";
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use("/api/addresses",  addressRoutes);
 app.use("/api/orders",     orderRoutes);
 app.use("/api/payments",   paymentRoutes);
 app.use("/api/reviews",    reviewRoutes);
+app.use("/api/seller",     sellerRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
