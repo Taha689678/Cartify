@@ -22,6 +22,14 @@ import { CheckoutPage } from "../pages/customer/CheckoutPage.jsx";
 import { OrderConfirmationPage } from "../pages/customer/OrderConfirmationPage.jsx";
 import { PaymentSuccessPage } from "../pages/customer/PaymentSuccessPage.jsx";
 import { PaymentFailedPage } from "../pages/customer/PaymentFailedPage.jsx";
+import { SellerLayout } from "../layouts/SellerLayout.jsx";
+import { SellerDashboardPage } from "../pages/seller/SellerDashboardPage.jsx";
+import { SellerProductsPage } from "../pages/seller/SellerProductsPage.jsx";
+import { CreateProductPage } from "../pages/seller/CreateProductPage.jsx";
+import { EditProductPage } from "../pages/seller/EditProductPage.jsx";
+import { SellerOrdersPage } from "../pages/seller/SellerOrdersPage.jsx";
+import { SellerOrderDetailsPage } from "../pages/seller/SellerOrderDetailsPage.jsx";
+
 
 export const AppRoutes = () => {
   return (
@@ -82,17 +90,14 @@ export const AppRoutes = () => {
       */}
 
       {/* Seller Routes - Role Protected */}
-      {/* Add seller routes here when pages are created */}
-      {/* Example:
-      <Route
-        path="/seller/dashboard"
-        element={
-          <RoleRoute allowedRoles={["seller", "admin"]}>
-            <SellerDashboard />
-          </RoleRoute>
-        }
-      />
-      */}
+      <Route path="/seller" element={<RoleRoute allowedRoles={["seller"]}><SellerLayout /></RoleRoute>}>
+        <Route path="dashboard" element={<SellerDashboardPage />} />
+        <Route path="products" element={<SellerProductsPage />} />
+        <Route path="products/new" element={<CreateProductPage />} />
+        <Route path="products/:id/edit" element={<EditProductPage />} />
+        <Route path="orders" element={<SellerOrdersPage />} />
+        <Route path="orders/:id" element={<SellerOrderDetailsPage />} />
+      </Route>
 
       {/* Admin Routes - Role Protected */}
       {/* Add admin routes here when pages are created */}

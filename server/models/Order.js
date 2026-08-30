@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -32,6 +32,7 @@ const orderItemSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    itemStatus: { type: String, enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'], default: 'pending' },
     quantity: {
       type: Number,
       required: [true, "Quantity is required"],
