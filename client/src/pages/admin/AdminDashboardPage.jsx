@@ -68,7 +68,7 @@ export const AdminDashboardPage = () => {
   }
 
   const kpis = [
-    { title: "Total Revenue", value: `$${(data?.totalRevenue || 0).toFixed(2)}`, icon: DollarSign, color: "text-green-600", bg: "bg-green-100" },
+    { title: "Total Revenue", value: `Rs ${(data?.totalRevenue || 0).toFixed(2)}`, icon: DollarSign, color: "text-green-600", bg: "bg-green-100" },
     { title: "Total Orders", value: data?.totalOrders || 0, icon: ShoppingCart, color: "text-blue-600", bg: "bg-blue-100" },
     { title: "Total Users", value: data?.totalUsers || 0, icon: Users, color: "text-purple-600", bg: "bg-purple-100" },
     { title: "Total Sellers", value: data?.totalSellers || 0, icon: Store, color: "text-indigo-600", bg: "bg-indigo-100" },
@@ -127,7 +127,7 @@ export const AdminDashboardPage = () => {
                     <p className="font-medium text-gray-800 line-clamp-1">{prod.productName || "Unknown Product"}</p>
                     <p className="text-sm text-gray-500">{prod.totalSold} sold</p>
                   </div>
-                  <div className="font-semibold text-gray-900">${(prod.totalRevenue || 0).toFixed(2)}</div>
+                  <div className="font-semibold text-gray-900">Rs {(prod.totalRevenue || 0).toFixed(2)}</div>
                 </div>
               ))
             ) : (
@@ -153,7 +153,7 @@ export const AdminDashboardPage = () => {
                     <p className="font-medium text-gray-800">{seller.storeName || "Unknown Store"}</p>
                     <p className="text-sm text-gray-500">{seller.totalSold} items sold</p>
                   </div>
-                  <div className="font-semibold text-gray-900">${(seller.totalRevenue || 0).toFixed(2)}</div>
+                  <div className="font-semibold text-gray-900">Rs {(seller.totalRevenue || 0).toFixed(2)}</div>
                 </div>
               ))
             ) : (

@@ -108,7 +108,7 @@ export const CartPage = () => {
                           {product.seller?.storeName && (
                             <p className="text-sm text-gray-500 mt-1">Sold by {product.seller.storeName}</p>
                           )}
-                          <p className="text-lg font-bold text-gray-900 mt-2">${currentPrice.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-gray-900 mt-2">Rs {currentPrice.toFixed(2)}</p>
                         </div>
                         <button 
                           onClick={() => removeItem(product._id)}
@@ -144,7 +144,7 @@ export const CartPage = () => {
                         {/* Subtotal */}
                         <div className="text-right">
                           <p className="text-sm text-gray-500">Subtotal</p>
-                          <p className="text-lg font-bold text-blue-600">${(currentPrice * item.quantity).toFixed(2)}</p>
+                          <p className="text-lg font-bold text-blue-600">Rs {(currentPrice * item.quantity).toFixed(2)}</p>
                         </div>
                       </div>
                     </div>
@@ -162,7 +162,7 @@ export const CartPage = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({cartItemCount} items)</span>
-                  <span className="font-medium text-gray-900">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium text-gray-900">Rs {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
@@ -177,7 +177,7 @@ export const CartPage = () => {
               <div className="border-t border-gray-100 pt-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">Estimated Total</span>
-                  <span className="text-2xl font-extrabold text-blue-600">${subtotal.toFixed(2)}</span>
+                  <span className="text-2xl font-extrabold text-blue-600">Rs {subtotal.toFixed(2)}</span>
                 </div>
               </div>
 

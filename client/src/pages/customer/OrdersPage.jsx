@@ -125,7 +125,7 @@ export const OrdersPage = () => {
                 <div className="flex flex-col sm:items-end gap-3 w-full sm:w-auto">
                   <div className="text-left sm:text-right">
                     <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="font-bold text-lg text-gray-900">${(order.totalAmount || 0).toFixed(2)}</p>
+                    <p className="font-bold text-lg text-gray-900">Rs {(order.totalAmount || 0).toFixed(2)}</p>
                     <p className="text-xs text-gray-500">{order.items?.length || 0} items</p>
                   </div>
                   

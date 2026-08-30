@@ -7,7 +7,7 @@ export const Specifications = () => {
       id: 1,
       icon: Truck,
       title: "Fast Delivery",
-      description: "Free shipping on orders over $50",
+      description: "Free shipping on orders over Rs 5000",
     },
     {
       id: 2,

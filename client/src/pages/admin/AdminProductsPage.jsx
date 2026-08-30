@@ -126,7 +126,7 @@ export const AdminProductsPage = () => {
                       {product.seller?.storeName || 'Unknown'}
                     </td>
                     <td className="p-4 text-sm">
-                      <div className="font-medium text-gray-900">${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</div>
+                      <div className="font-medium text-gray-900">Rs {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</div>
                       <div className="text-gray-500">{product.stock} in stock</div>
                     </td>
                     <td className="p-4">

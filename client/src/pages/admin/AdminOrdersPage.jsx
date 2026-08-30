@@ -136,7 +136,7 @@ export const AdminOrdersPage = () => {
                       <p className="text-xs text-gray-500">{order.user?.email}</p>
                     </td>
                     <td className="p-4">
-                      <div className="font-medium text-gray-900">${(order.totalAmount || 0).toFixed(2)}</div>
+                      <div className="font-medium text-gray-900">Rs {(order.totalAmount || 0).toFixed(2)}</div>
                       <div className="text-xs text-gray-500">{order.items?.length || 0} items</div>
                     </td>
                     <td className="p-4">

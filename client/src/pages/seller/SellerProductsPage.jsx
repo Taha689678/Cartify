@@ -109,7 +109,7 @@ export const SellerProductsPage = () => {
               </div>
               <div className="p-4 flex flex-col flex-grow">
                 <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
-                <p className="text-gray-600 font-medium mb-4">${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</p>
+                <p className="text-gray-600 font-medium mb-4">Rs {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</p>
                 
                 <div className="mt-auto space-y-4">
                   <div className="flex items-center justify-between">

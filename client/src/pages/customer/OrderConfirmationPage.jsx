@@ -89,8 +89,7 @@ export const OrderConfirmationPage = () => {
                       <h3 className="font-medium text-gray-900">{name}</h3>
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                     </div>
-                    <div className="font-bold text-gray-900">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    <div className="font-bold text-gray-900">Rs {(item.price * item.quantity).toFixed(2)}
                     </div>
                   </div>
                 );
@@ -100,7 +99,7 @@ export const OrderConfirmationPage = () => {
             {/* Total */}
             <div className="flex justify-between items-center py-4 border-t border-gray-100">
               <span className="text-lg font-bold text-gray-900">Total Amount</span>
-              <span className="text-2xl font-extrabold text-blue-600">${order.totalAmount?.toFixed(2)}</span>
+              <span className="text-2xl font-extrabold text-blue-600">Rs {order.totalAmount?.toFixed(2)}</span>
             </div>
           </div>
         </div>

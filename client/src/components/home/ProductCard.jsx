@@ -119,9 +119,9 @@ export const ProductCard = ({ product }) => {
 
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xl font-bold text-gray-900">${product.price?.toFixed(2)}</span>
+            <span className="text-xl font-bold text-gray-900">Rs {product.price?.toFixed(2)}</span>
             {compareAtPrice > product.price && (
-              <span className="text-sm text-gray-400 line-through">${compareAtPrice?.toFixed(2)}</span>
+              <span className="text-sm text-gray-400 line-through">Rs {compareAtPrice?.toFixed(2)}</span>
             )}
           </div>
           <button 

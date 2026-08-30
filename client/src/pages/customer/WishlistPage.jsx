@@ -145,9 +145,9 @@ export const WishlistPage = () => {
                 </Link>
                 
                 <div className="flex items-center gap-2 mt-auto pt-4">
-                  <span className="text-lg font-bold text-gray-900">${product.price?.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-gray-900">Rs {product.price?.toFixed(2)}</span>
                   {product.compareAtPrice > product.price && (
-                    <span className="text-sm text-gray-400 line-through">${product.compareAtPrice?.toFixed(2)}</span>
+                    <span className="text-sm text-gray-400 line-through">Rs {product.compareAtPrice?.toFixed(2)}</span>
                   )}
                 </div>
 

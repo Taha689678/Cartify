@@ -53,7 +53,7 @@ export const SellerDashboardPage = () => {
   const stats = [
     {
       title: "Total Revenue",
-      value: `$${(data?.revenue || 0).toFixed(2)}`,
+      value: `Rs ${(data?.revenue || 0).toFixed(2)}`,
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-100",

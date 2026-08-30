@@ -186,8 +186,8 @@ export const OrderDetailsPage = () => {
                     <p className="text-sm text-gray-500 mt-1">Qty: {item.quantity}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                    <p className="font-bold text-gray-900">Rs {(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">Rs {item.price.toFixed(2)} each</p>
                   </div>
                 </div>
               ))}
@@ -229,15 +229,15 @@ export const OrderDetailsPage = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${((order.totalAmount || 0) - (order.shippingFee || 0)).toFixed(2)}</span>
+                  <span>Rs {((order.totalAmount || 0) - (order.shippingFee || 0)).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>{order.shippingFee === 0 ? 'Free' : `$${(order.shippingFee || 0).toFixed(2)}`}</span>
+                  <span>{order.shippingFee === 0 ? 'Free' : `Rs ${(order.shippingFee || 0).toFixed(2)}`}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-base text-gray-900">
                   <span>Total</span>
-                  <span>${(order.totalAmount || 0).toFixed(2)}</span>
+                  <span>Rs {(order.totalAmount || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

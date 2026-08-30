@@ -128,9 +128,9 @@ export const AdminOrderDetailsPage = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900">${(item.price || 0).toFixed(2)}</p>
+                    <p className="font-medium text-gray-900">Rs {(item.price || 0).toFixed(2)}</p>
                     <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                    <p className="font-bold mt-1 text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-bold mt-1 text-gray-900">Rs {(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -195,15 +195,15 @@ export const AdminOrderDetailsPage = () => {
               <div className="border-t border-gray-100 pt-3 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>${(totals?.subtotal || 0).toFixed(2)}</span>
+                  <span>Rs {(totals?.subtotal || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span>${(totals?.shipping || 0).toFixed(2)}</span>
+                  <span>Rs {(totals?.shipping || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
                   <span>Total</span>
-                  <span className="text-red-600">${(order.totalAmount || 0).toFixed(2)}</span>
+                  <span className="text-red-600">Rs {(order.totalAmount || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

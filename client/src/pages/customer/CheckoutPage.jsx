@@ -244,8 +244,7 @@ export const CheckoutPage = () => {
                         <h3 className="font-medium text-gray-900 line-clamp-1">{product.name}</h3>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
-                      <div className="font-bold text-gray-900">
-                        ${(currentPrice * item.quantity).toFixed(2)}
+                      <div className="font-bold text-gray-900">Rs {(currentPrice * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   );
@@ -262,7 +261,7 @@ export const CheckoutPage = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({cartItemCount} items)</span>
-                  <span className="font-medium text-gray-900">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium text-gray-900">Rs {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
@@ -277,7 +276,7 @@ export const CheckoutPage = () => {
               <div className="border-t border-gray-100 pt-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">Total</span>
-                  <span className="text-2xl font-extrabold text-blue-600">${subtotal.toFixed(2)}</span>
+                  <span className="text-2xl font-extrabold text-blue-600">Rs {subtotal.toFixed(2)}</span>
                 </div>
               </div>
 

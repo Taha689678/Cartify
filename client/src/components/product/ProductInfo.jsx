@@ -106,10 +106,10 @@ export const ProductInfo = ({ product }) => {
       </div>
 
       <div className="flex items-end gap-3 pb-6 border-b border-gray-100">
-        <span className="text-4xl font-extrabold text-gray-900">${product.price?.toFixed(2)}</span>
+        <span className="text-4xl font-extrabold text-gray-900">Rs {product.price?.toFixed(2)}</span>
         {product.compareAtPrice > product.price && (
           <>
-            <span className="text-xl text-gray-400 line-through mb-1">${product.compareAtPrice?.toFixed(2)}</span>
+            <span className="text-xl text-gray-400 line-through mb-1">Rs {product.compareAtPrice?.toFixed(2)}</span>
             <span className="text-sm font-bold text-green-600 bg-green-50 px-2 py-1 rounded mb-1">
               Save {Math.round((1 - product.price / product.compareAtPrice) * 100)}%
             </span>

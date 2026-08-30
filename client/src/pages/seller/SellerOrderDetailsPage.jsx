@@ -97,7 +97,7 @@ export const SellerOrderDetailsPage = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Amount</p>
-              <p className="font-medium">${typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : order.totalAmount}</p>
+              <p className="font-medium">Rs {typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : order.totalAmount}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Payment Status</p>
