@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -14,6 +14,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use("/api/payments",   paymentRoutes);
 app.use("/api/reviews",    reviewRoutes);
 app.use("/api/seller",     sellerRoutes);
 app.use("/api/upload",     uploadRoutes);
+app.use("/api/admin",      adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

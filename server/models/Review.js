@@ -37,6 +37,10 @@ const reviewSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: {
+        values: ["published", "hidden", "flagged"],
+        message: "Review status must be published, hidden, or flagged",
+      },
       default: "published",
     },
   },

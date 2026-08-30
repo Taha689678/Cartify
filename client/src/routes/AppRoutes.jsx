@@ -30,6 +30,17 @@ import { EditProductPage } from "../pages/seller/EditProductPage.jsx";
 import { SellerOrdersPage } from "../pages/seller/SellerOrdersPage.jsx";
 import { SellerOrderDetailsPage } from "../pages/seller/SellerOrderDetailsPage.jsx";
 
+// Admin Imports
+import { AdminLayout } from "../components/layout/AdminLayout.jsx";
+import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage.jsx";
+import { AdminUsersPage } from "../pages/admin/AdminUsersPage.jsx";
+import { AdminSellersPage } from "../pages/admin/AdminSellersPage.jsx";
+import { AdminProductsPage } from "../pages/admin/AdminProductsPage.jsx";
+import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage.jsx";
+import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage.jsx";
+import { AdminOrderDetailsPage } from "../pages/admin/AdminOrderDetailsPage.jsx";
+import { AdminReviewsPage } from "../pages/admin/AdminReviewsPage.jsx";
+
 
 export const AppRoutes = () => {
   return (
@@ -100,17 +111,16 @@ export const AppRoutes = () => {
       </Route>
 
       {/* Admin Routes - Role Protected */}
-      {/* Add admin routes here when pages are created */}
-      {/* Example:
-      <Route
-        path="/admin/dashboard"
-        element={
-          <RoleRoute allowedRoles={["admin"]}>
-            <AdminDashboard />
-          </RoleRoute>
-        }
-      />
-      */}
+      <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="sellers" element={<AdminSellersPage />} />
+        <Route path="products" element={<AdminProductsPage />} />
+        <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="orders" element={<AdminOrdersPage />} />
+        <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
+        <Route path="reviews" element={<AdminReviewsPage />} />
+      </Route>
     </Routes>
   );
 };
