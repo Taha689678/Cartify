@@ -10,7 +10,7 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
   const { cartItemCount } = useCart();
   const { categories } = useCategories({ limit: 10 });
 
-  const isSeller = user?.role === "seller" || user?.role === "admin";
+  const isSeller = user?.role === "seller";
   const sellerStatus = user?.sellerStatus || "pending";
 
   return (

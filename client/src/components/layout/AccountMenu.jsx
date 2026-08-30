@@ -35,7 +35,7 @@ export const AccountMenu = () => {
     );
   }
 
-  const isSeller = user.role === "seller" || user.role === "admin";
+  const isSeller = user.role === "seller";
   const sellerStatus = user?.seller?.status || user.sellerStatus || "pending"; // Fallback if schema doesn't have it explicitly yet
 
   return (
