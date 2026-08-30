@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sellerApi } from '../../api/sellerApi';
 import { categoryApi } from '../../api/categoryApi';
+import { uploadApi } from '../../api/uploadApi';
 
 export const CreateProductPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -17,32 +20,52 @@ export const CreateProductPage = () => {
   });
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await categoryApi.getAll();
+        setCategories(res.data?.data?.categories || res.data?.categories || []);
+      } catch (err) {
+        console.error('Failed to load categories', err);
+      }
+    };
     fetchCategories();
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await categoryApi.getAll();
-      setCategories(res.data?.categories || res.data || []);
-    } catch (err) {
-      console.error('Failed to load categories', err);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
+      
+      let imageUrls = [];
+      if (imageFile) {
+        setUploadingImage(true);
+        const uploadRes = await uploadApi.uploadImage(imageFile);
+        if (uploadRes.data?.data) {
+           imageUrls.push({ url: uploadRes.data.data.url, publicId: uploadRes.data.data.publicId });
+        }
+        setUploadingImage(false);
+      }
+
       const dataToSubmit = {
         ...formData,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock, 10),
       };
+      
+      if (imageUrls.length > 0) {
+        dataToSubmit.images = imageUrls;
+      }
       
       // The API might expect categories as an array, but we're doing a single select for MVP
       if (formData.category) {
@@ -56,6 +79,7 @@ export const CreateProductPage = () => {
       alert('Failed to create product');
     } finally {
       setLoading(false);
+      setUploadingImage(false);
     }
   };
 
@@ -88,9 +112,20 @@ export const CreateProductPage = () => {
           />
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 bg-white"
+          />
+          {imageFile && <p className="text-sm text-green-600 mt-1">Image selected: {imageFile.name}</p>}
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price ($) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price (Rs) *</label>
             <input
               type="number"
               name="price"
@@ -155,10 +190,10 @@ export const CreateProductPage = () => {
           </button>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploadingImage}
             className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
           >
-            {loading ? 'Creating...' : 'Create Product'}
+            {loading || uploadingImage ? 'Uploading & Creating...' : 'Create Product'}
           </button>
         </div>
       </form>

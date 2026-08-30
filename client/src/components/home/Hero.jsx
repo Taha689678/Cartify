@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Hero3D } from "./Hero3D.jsx";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -61,13 +62,13 @@ export const Hero = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <button className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              <Link to="/shop" className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                 Shop Now
                 <ArrowRight size={20} />
-              </button>
-              <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-600 hover:text-blue-600 transition-colors">
+              </Link>
+              <Link to="/shop?sort=best-selling" className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold flex items-center justify-center hover:border-blue-600 hover:text-blue-600 transition-colors">
                 Learn More
-              </button>
+              </Link>
             </motion.div>
           </motion.div>
 

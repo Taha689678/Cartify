@@ -120,11 +120,11 @@ export const ProductInfo = ({ product }) => {
       <div className="py-2">
         <div className="flex items-center gap-2 mb-4">
           {inStock ? (
-            <>
+           <>
               <CheckCircle size={20} className="text-green-500" />
               <span className="font-medium text-green-600">In Stock</span>
               {product.stock <= 5 && (
-                <span className="text-sm text-orange-500 ml-2 bg-orange-50 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-sm text-red-500 ml-2 bg-red-50 px-2 py-0.5 rounded-full font-medium">
                   Only {product.stock} left!
                 </span>
               )}

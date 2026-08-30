@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Grid, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,10 +58,12 @@ export const CategoryMegaMenu = () => {
                   className="flex items-center gap-3 p-2 rounded-xl hover:bg-blue-50 group transition-colors"
                 >
                   <div className="w-10 h-10 bg-gray-50 group-hover:bg-white rounded-lg flex items-center justify-center border border-gray-100 group-hover:border-blue-100 group-hover:shadow-sm transition-all overflow-hidden text-2xl">
-                    {cat.image ? (
-                      <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                    {cat.image?.url ? (
+                      <img src={cat.image.url} alt={cat.name} className="w-full h-full object-cover" />
                     ) : (
-                      <span>📦</span>
+                      <span className="text-lg font-bold text-gray-400 group-hover:text-blue-500">
+                        {cat.name.charAt(0)}
+                      </span>
                     )}
                   </div>
                   <span className="font-medium text-gray-700 group-hover:text-blue-700 transition-colors">

@@ -15,7 +15,7 @@ export const SellerProductsPage = () => {
     try {
       setLoading(true);
       const res = await sellerApi.getProducts();
-      setProducts(res.data?.products || res.data || []);
+      setProducts(res.data?.data?.products || res.data?.products || (Array.isArray(res.data?.data) ? res.data.data : []));
       setError(null);
     } catch (err) {
       console.error(err);

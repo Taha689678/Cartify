@@ -20,37 +20,38 @@ export const EditProductPage = () => {
     category: ''
   });
 
+
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setInitialLoading(true);
+        
+        const [productRes, categoryRes] = await Promise.all([
+          sellerApi.getProduct(id),
+          categoryApi.getAll()
+        ]);
+        
+        const prod = productRes.data?.data?.product || productRes.data?.data || productRes.data?.product || productRes.data;
+        setCategories(categoryRes.data?.data?.categories || categoryRes.data?.categories || []);
+        
+        setFormData({
+          name: prod.name || '',
+          description: prod.description || '',
+          price: prod.price || '',
+          stock: prod.stock || '',
+          sku: prod.sku || '',
+          category: prod.category?._id || prod.category || ''
+        });
+        
+      } catch (err) {
+        console.error('Failed to load data', err);
+        setError('Failed to load product details');
+      } finally {
+        setInitialLoading(false);
+      }
+    };
     fetchData();
   }, [id]);
-
-  const fetchData = async () => {
-    try {
-      setInitialLoading(true);
-      const [productRes, categoryRes] = await Promise.all([
-        sellerApi.getProduct(id),
-        categoryApi.getAll()
-      ]);
-      
-      const product = productRes.data?.product || productRes.data;
-      setCategories(categoryRes.data?.categories || categoryRes.data || []);
-      
-      setFormData({
-        name: product.name || '',
-        description: product.description || '',
-        price: product.price?.toString() || '',
-        stock: product.stock?.toString() || '',
-        sku: product.sku || '',
-        category: product.categories && product.categories.length > 0 ? (product.categories[0]._id || product.categories[0]) : ''
-      });
-      setError(null);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load product data');
-    } finally {
-      setInitialLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;

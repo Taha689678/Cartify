@@ -18,6 +18,18 @@ export const getProducts = async (req, res, next) => {
 export const createProduct = async (req, res, next) => {
   try {
     const productData = { ...req.body, seller: req.sellerId };
+    
+    // Generate slug from name if not provided
+    if (!productData.slug && productData.name) {
+      const baseSlug = productData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+      // Append random string to prevent duplicates
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      productData.slug = `${baseSlug}-${randomStr}`;
+    }
+
     const product = await Product.create(productData);
     return successResponse(res, 201, "Product created successfully", product);
   } catch (error) {
