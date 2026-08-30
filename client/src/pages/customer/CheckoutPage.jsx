@@ -4,7 +4,8 @@ import { useCart } from '../../context/CartContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { addressApi } from '../../api/addressApi.js';
 import { orderApi } from '../../api/orderApi.js';
-import { MapPin, AlertCircle, Loader2 } from 'lucide-react';
+import { paymentApi } from '../../api/paymentApi.js';
+import { MapPin, AlertCircle, Loader2, CreditCard, Wallet } from 'lucide-react';
 
 export const CheckoutPage = () => {
   const { cart, loading: cartLoading, subtotal, cartItemCount, refreshCart } = useCart();
@@ -13,6 +14,7 @@ export const CheckoutPage = () => {
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loadingAddresses, setLoadingAddresses] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [error, setError] = useState(null);
@@ -75,14 +77,26 @@ export const CheckoutPage = () => {
       setError(null);
       const res = await orderApi.createOrder({
         addressId: selectedAddressId,
-        paymentMethod: 'cod'
+        paymentMethod: paymentMethod
       });
-      await refreshCart();
-      const orderId = res.data.data.order._id || res.data.data._id;
-      navigate(`/order-confirmation/${orderId}`);
+      
+      const orderId = res.data.data.order?._id || res.data.data._id;
+
+      if (paymentMethod === 'online') {
+        const paymentRes = await paymentApi.initiatePayFastPayment({ orderId });
+        const checkoutUrl = paymentRes.data.data.checkoutUrl;
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl;
+        } else {
+          setError("Failed to initiate payment. Please try again.");
+          setPlacingOrder(false);
+        }
+      } else {
+        await refreshCart();
+        navigate(`/order-confirmation/${orderId}`);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to place order.");
-    } finally {
       setPlacingOrder(false);
     }
   };
@@ -154,6 +168,60 @@ export const CheckoutPage = () => {
               )}
             </div>
 
+            {/* Payment Method Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <CreditCard size={24} className="text-blue-600" />
+                Payment Method
+              </h2>
+              
+              <div className="space-y-4">
+                <label 
+                  className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                    paymentMethod === 'online' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="online"
+                    checked={paymentMethod === 'online'}
+                    onChange={() => setPaymentMethod('online')}
+                    className="mt-1 mr-4 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <div className="flex-1 flex items-center gap-3">
+                    <CreditCard className="text-gray-500" size={20} />
+                    <div>
+                      <p className="font-bold text-gray-900">Easypaisa (PayFast)</p>
+                      <p className="text-sm text-gray-600">Pay securely via PayFast.</p>
+                    </div>
+                  </div>
+                </label>
+
+                <label 
+                  className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                    paymentMethod === 'cod' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={() => setPaymentMethod('cod')}
+                    className="mt-1 mr-4 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <div className="flex-1 flex items-center gap-3">
+                    <Wallet className="text-gray-500" size={20} />
+                    <div>
+                      <p className="font-bold text-gray-900">Cash on Delivery</p>
+                      <p className="text-sm text-gray-600">Pay when your order arrives.</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
             {/* Order Items Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Review Items</h2>
@@ -202,7 +270,7 @@ export const CheckoutPage = () => {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Payment Method</span>
-                  <span className="font-medium text-gray-900">Cash on Delivery</span>
+                  <span className="font-medium text-gray-900">{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Easypaisa (PayFast)'}</span>
                 </div>
               </div>
 

@@ -1,7 +1,8 @@
-﻿import Order from "../models/Order.js";
+import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 import Address from "../models/Address.js";
+import Payment from "../models/Payment.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const getOrders = async (req, res, next) => {
@@ -104,6 +105,19 @@ export const createOrder = async (req, res, next) => {
     });
 
     await order.save();
+
+    if (paymentMethod === "cod") {
+      const payment = new Payment({
+        order: order._id,
+        user: req.user.id,
+        provider: "cod",
+        paymentMethod: "cod",
+        amount: totalAmount,
+        currency: "PKR",
+        status: "pending",
+      });
+      await payment.save();
+    }
 
     cart.items = [];
     await cart.save();

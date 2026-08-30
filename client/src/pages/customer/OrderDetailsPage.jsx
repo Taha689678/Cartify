@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Package, AlertCircle, MapPin, CreditCard, ChevronLeft } from 'lucide-react';
 import { orderApi } from '../../api/orderApi.js';
+import { paymentApi } from '../../api/paymentApi.js';
 
 export const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -37,6 +38,25 @@ export const OrderDetailsPage = () => {
       alert(err.response?.data?.message || 'Failed to cancel order.');
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const [retryingPayment, setRetryingPayment] = useState(false);
+
+  const handleRetryPayment = async () => {
+    try {
+      setRetryingPayment(true);
+      const paymentRes = await paymentApi.initiatePayFastPayment({ orderId: id });
+      const checkoutUrl = paymentRes.data.data.checkoutUrl;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        alert("Failed to initiate payment. Please try again.");
+        setRetryingPayment(false);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to initiate payment.');
+      setRetryingPayment(false);
     }
   };
 
@@ -116,15 +136,27 @@ export const OrderDetailsPage = () => {
             </div>
           </div>
           
-          {isCancelable && (
-            <button
-              onClick={handleCancelOrder}
-              disabled={cancelling}
-              className="px-5 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors border border-red-100 disabled:opacity-50 w-full md:w-auto"
-            >
-              {cancelling ? 'Cancelling...' : 'Cancel Order'}
-            </button>
-          )}
+          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            {order.paymentStatus === 'pending' && order.paymentMethod === 'online' && (
+              <button
+                onClick={handleRetryPayment}
+                disabled={retryingPayment}
+                className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 w-full md:w-auto"
+              >
+                {retryingPayment ? 'Redirecting...' : 'Retry Payment'}
+              </button>
+            )}
+
+            {isCancelable && (
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling}
+                className="px-5 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors border border-red-100 disabled:opacity-50 w-full md:w-auto"
+              >
+                {cancelling ? 'Cancelling...' : 'Cancel Order'}
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
