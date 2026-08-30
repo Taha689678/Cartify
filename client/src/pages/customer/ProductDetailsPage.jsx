@@ -5,6 +5,7 @@ import { ChevronRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { productApi } from '../../api/productApi.js';
 import { ProductGallery } from '../../components/product/ProductGallery.jsx';
 import { ProductInfo } from '../../components/product/ProductInfo.jsx';
+import ReviewSection from '../../components/product/ReviewSection.jsx';
 
 export const ProductDetailsPage = () => {
   const { slug } = useParams();
@@ -131,6 +132,11 @@ export const ProductDetailsPage = () => {
             <ProductInfo product={product} />
           </div>
         </motion.div>
+
+        {/* Review Section */}
+        <div className="mt-12 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 lg:p-12">
+          <ReviewSection productId={product._id} />
+        </div>
       </div>
     </div>
   );
