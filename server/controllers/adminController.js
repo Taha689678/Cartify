@@ -331,7 +331,7 @@ export const updateSellerStatus = async (req, res, next) => {
     const { id } = req.params;
     validateObjectId(id, "seller ID");
 
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
     if (
       !status ||
       !["pending", "approved", "rejected", "suspended"].includes(status)
@@ -344,9 +344,19 @@ export const updateSellerStatus = async (req, res, next) => {
       );
     }
 
+    const updateData = { 
+      status,
+      reviewedBy: req.user.id || req.user._id,
+      reviewedAt: new Date()
+    };
+    
+    if (status === "rejected" && rejectionReason !== undefined) {
+      updateData.rejectionReason = rejectionReason;
+    }
+
     const seller = await Seller.findByIdAndUpdate(
       id,
-      { status },
+      updateData,
       { new: true, runValidators: true }
     ).populate("user", SAFE_USER_FIELDS);
 

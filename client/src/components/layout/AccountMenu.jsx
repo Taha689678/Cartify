@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { User, LogOut, ChevronDown, Package, Heart, MapPin, Key, LayoutDashboard, FileText } from "lucide-react";
+import { User, LogOut, ChevronDown, Package, Heart, MapPin, Key, LayoutDashboard, FileText, Store } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -85,10 +85,19 @@ export const AccountMenu = () => {
 
             {isSeller && sellerStatus !== "approved" && (
               <div className="px-2 mb-2">
-                <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 rounded-lg border border-amber-100">
+                <Link to="/become-seller" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 rounded-lg border border-amber-100 hover:bg-amber-100 transition-colors">
                   <FileText size={18} />
                   Seller App: {sellerStatus.charAt(0).toUpperCase() + sellerStatus.slice(1)}
-                </div>
+                </Link>
+              </div>
+            )}
+
+            {!isSeller && user.role === "customer" && (
+              <div className="px-2 mb-2">
+                <Link to="/become-seller" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors">
+                  <Store size={18} />
+                  Become a Seller
+                </Link>
               </div>
             )}
 

@@ -24,7 +24,7 @@ export const AdminLayout = () => {
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Sellers", href: "/admin/sellers", icon: Store },
+    { name: "Applications", href: "/admin/seller-applications", icon: Store },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Categories", href: "/admin/categories", icon: Tags },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },

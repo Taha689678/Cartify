@@ -13,12 +13,12 @@ import {
   getDashboard
 } from "../controllers/sellerController.js";
 import requireAuth from "../middleware/authMiddleware.js";
-import { requireSeller } from "../middleware/sellerMiddleware.js";
+import requireApprovedSeller from "../middleware/sellerMiddleware.js";
 
 const router = express.Router();
 
 router.use(requireAuth);
-router.use(requireSeller);
+router.use(requireApprovedSeller);
 
 // Dashboard
 router.get("/dashboard", getDashboard);

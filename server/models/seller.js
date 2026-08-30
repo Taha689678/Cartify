@@ -50,6 +50,20 @@ const sellerSchema = new mongoose.Schema(
       },
       default: "pending",
     },
+    rejectionReason: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    reviewedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

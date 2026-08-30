@@ -43,6 +43,7 @@ const requireApprovedSeller = async (req, res, next) => {
     }
 
     req.seller = seller;
+    req.sellerId = seller._id.toString();
 
     return next();
   } catch (error) {

@@ -15,6 +15,7 @@ import reviewRoutes from "./routes/reviewRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import sellerApplicationRoutes from "./routes/sellerApplicationRoutes.js";
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use("/api/reviews",    reviewRoutes);
 app.use("/api/seller",     sellerRoutes);
 app.use("/api/upload",     uploadRoutes);
 app.use("/api/admin",      adminRoutes);
+app.use("/api/seller-applications", sellerApplicationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

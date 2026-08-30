@@ -34,7 +34,8 @@ import { SellerOrderDetailsPage } from "../pages/seller/SellerOrderDetailsPage.j
 import { AdminLayout } from "../components/layout/AdminLayout.jsx";
 import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage.jsx";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage.jsx";
-import { AdminSellersPage } from "../pages/admin/AdminSellersPage.jsx";
+import { AdminSellerApplicationsPage } from "../pages/admin/AdminSellerApplicationsPage.jsx";
+import { BecomeSellerPage } from "../pages/customer/BecomeSellerPage.jsx";
 import { AdminProductsPage } from "../pages/admin/AdminProductsPage.jsx";
 import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage.jsx";
 import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage.jsx";
@@ -61,6 +62,7 @@ export const AppRoutes = () => {
         <Route element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
           <Route path="profile" element={<ProfilePage />} />
           <Route path="addresses" element={<AddressesPage />} />
+          <Route path="become-seller" element={<BecomeSellerPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:id" element={<OrderDetailsPage />} />
         </Route>
@@ -114,7 +116,7 @@ export const AppRoutes = () => {
       <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
-        <Route path="sellers" element={<AdminSellersPage />} />
+        <Route path="seller-applications" element={<AdminSellerApplicationsPage />} />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
