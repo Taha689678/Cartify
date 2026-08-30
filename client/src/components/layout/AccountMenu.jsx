@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { User, LogOut, ChevronDown, Package, Heart, MapPin, Key, LayoutDashboard, FileText } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -64,6 +64,15 @@ export const AccountMenu = () => {
               <p className="font-semibold text-gray-900 truncate">{user.name}</p>
               <p className="text-sm text-gray-500 truncate">{user.email}</p>
             </div>
+
+            {user.role === "admin" && (
+              <div className="px-2 mb-2">
+                <Link to="/admin/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                  <LayoutDashboard size={18} />
+                  Admin Panel
+                </Link>
+              </div>
+            )}
 
             {isSeller && sellerStatus === "approved" && (
               <div className="px-2 mb-2">
