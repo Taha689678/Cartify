@@ -7,6 +7,15 @@ import { AccountLayout } from "../layouts/AccountLayout.jsx";
 import { HomePage } from "../pages/customer/HomePage.jsx";
 import { ShopPage } from "../pages/customer/ShopPage.jsx";
 import { ProductDetailsPage } from "../pages/customer/ProductDetailsPage.jsx";
+import { AboutPage } from "../pages/customer/AboutPage.jsx";
+import { CareersPage } from "../pages/customer/CareersPage.jsx";
+import { ContactPage } from "../pages/customer/ContactPage.jsx";
+import { TrackOrderPage } from "../pages/customer/TrackOrderPage.jsx";
+import { ReturnsPage } from "../pages/customer/ReturnsPage.jsx";
+import { FAQPage } from "../pages/customer/FAQPage.jsx";
+import { PrivacyPolicyPage } from "../pages/customer/PrivacyPolicyPage.jsx";
+import { TermsPage } from "../pages/customer/TermsPage.jsx";
+import { CookiePolicyPage } from "../pages/customer/CookiePolicyPage.jsx";
 import { CartPage } from "../pages/customer/CartPage.jsx";
 import { WishlistPage } from "../pages/customer/WishlistPage.jsx";
 import { ProfilePage } from "../pages/customer/ProfilePage.jsx";
@@ -42,7 +51,6 @@ import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage.jsx";
 import { AdminOrderDetailsPage } from "../pages/admin/AdminOrderDetailsPage.jsx";
 import { AdminReviewsPage } from "../pages/admin/AdminReviewsPage.jsx";
 
-
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -51,15 +59,72 @@ export const AppRoutes = () => {
         <Route index element={<HomePage />} />
         <Route path="shop" element={<ShopPage />} />
         <Route path="product/:slug" element={<ProductDetailsPage />} />
-        <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
-        <Route path="wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
-        <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-        <Route path="order-confirmation/:id" element={<ProtectedRoute><OrderConfirmationPage /></ProtectedRoute>} />
-        <Route path="payment/success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
-        <Route path="payment/failed" element={<ProtectedRoute><PaymentFailedPage /></ProtectedRoute>} />
-        
+        <Route path="about" element={<AboutPage />} />
+        <Route path="careers" element={<CareersPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="track-order" element={<TrackOrderPage />} />
+        <Route path="returns" element={<ReturnsPage />} />
+        <Route path="faq" element={<FAQPage />} />
+        <Route path="privacy" element={<PrivacyPolicyPage />} />
+        <Route path="terms" element={<TermsPage />} />
+        <Route path="cookie-policy" element={<CookiePolicyPage />} />
+        <Route
+          path="cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="wishlist"
+          element={
+            <ProtectedRoute>
+              <WishlistPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="order-confirmation/:id"
+          element={
+            <ProtectedRoute>
+              <OrderConfirmationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment/success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccessPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment/failed"
+          element={
+            <ProtectedRoute>
+              <PaymentFailedPage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Account Routes */}
-        <Route element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <AccountLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="profile" element={<ProfilePage />} />
           <Route path="addresses" element={<AddressesPage />} />
           <Route path="become-seller" element={<BecomeSellerPage />} />
@@ -67,7 +132,7 @@ export const AppRoutes = () => {
           <Route path="orders/:id" element={<OrderDetailsPage />} />
         </Route>
       </Route>
-      
+
       {/* Auth Routes - Public Only */}
       <Route
         path="/login"
@@ -103,7 +168,14 @@ export const AppRoutes = () => {
       */}
 
       {/* Seller Routes - Role Protected */}
-      <Route path="/seller" element={<RoleRoute allowedRoles={["seller"]}><SellerLayout /></RoleRoute>}>
+      <Route
+        path="/seller"
+        element={
+          <RoleRoute allowedRoles={["seller"]}>
+            <SellerLayout />
+          </RoleRoute>
+        }
+      >
         <Route path="dashboard" element={<SellerDashboardPage />} />
         <Route path="products" element={<SellerProductsPage />} />
         <Route path="products/new" element={<CreateProductPage />} />
@@ -113,10 +185,20 @@ export const AppRoutes = () => {
       </Route>
 
       {/* Admin Routes - Role Protected */}
-      <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>
+      <Route
+        path="/admin"
+        element={
+          <RoleRoute allowedRoles={["admin"]}>
+            <AdminLayout />
+          </RoleRoute>
+        }
+      >
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
-        <Route path="seller-applications" element={<AdminSellerApplicationsPage />} />
+        <Route
+          path="seller-applications"
+          element={<AdminSellerApplicationsPage />}
+        />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />

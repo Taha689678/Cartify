@@ -1,4 +1,4 @@
-﻿import { ShoppingBag, Globe, MessageCircle, Share2, Mail } from "lucide-react";
+import { ShoppingBag, Globe, MessageCircle, Share2, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.jpeg";
 import { motion } from "framer-motion";
@@ -40,7 +40,7 @@ export const Footer = () => {
             <ul className="space-y-4 text-gray-400 font-medium">
               <li><Link to="/about" className="hover:text-blue-400 transition-colors">About</Link></li>
               <li><Link to="/careers" className="hover:text-blue-400 transition-colors">Careers</Link></li>
-              <li><Link to="/sell" className="hover:text-blue-400 transition-colors text-blue-400">Sell on Cartify</Link></li>
+              <li><Link to="/become-seller" className="hover:text-blue-400 transition-colors text-blue-400">Sell on Cartify</Link></li>
             </ul>
           </div>
 
