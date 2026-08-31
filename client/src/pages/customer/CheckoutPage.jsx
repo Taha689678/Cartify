@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { addressApi } from '../../api/addressApi.js';
 import { orderApi } from '../../api/orderApi.js';
 import { paymentApi } from '../../api/paymentApi.js';
+import { getOrCreateIdempotencyKey, clearIdempotencyKey } from '../../utils/idempotencyKeyUtils.js';
 import { MapPin, AlertCircle, Loader2, CreditCard, Wallet } from 'lucide-react';
 
 export const CheckoutPage = () => {
@@ -75,12 +76,20 @@ export const CheckoutPage = () => {
     try {
       setPlacingOrder(true);
       setError(null);
+      
+      // Get or create idempotency key to prevent duplicate orders
+      const idempotencyKey = getOrCreateIdempotencyKey();
+      
       const res = await orderApi.createOrder({
         addressId: selectedAddressId,
-        paymentMethod: paymentMethod
+        paymentMethod: paymentMethod,
+        idempotencyKey: idempotencyKey
       });
       
       const orderId = res.data.data.order?._id || res.data.data._id;
+      
+      // Clear the idempotency key after successful order creation
+      clearIdempotencyKey();
 
       if (paymentMethod === 'online') {
         const paymentRes = await paymentApi.initiatePayFastPayment({ orderId });

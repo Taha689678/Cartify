@@ -105,6 +105,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User reference is required"],
     },
+    idempotencyKey: {
+      type: String,
+      required: [true, "Idempotency key is required"],
+      trim: true,
+    },
     items: {
       type: [orderItemSchema],
       required: true,
@@ -180,6 +185,8 @@ orderSchema.index({ "items.seller": 1 });
 orderSchema.index({ orderStatus: 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
+// Unique index on (user, idempotencyKey) to prevent duplicate orders
+orderSchema.index({ user: 1, idempotencyKey: 1 }, { unique: true });
 
 const Order = mongoose.model("Order", orderSchema);
 

@@ -3,6 +3,7 @@ import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 import Address from "../models/Address.js";
 import Payment from "../models/Payment.js";
+import mongoose from "mongoose";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const getOrders = async (req, res, next) => {
@@ -15,27 +16,86 @@ export const getOrders = async (req, res, next) => {
 };
 
 export const createOrder = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
-    let { addressId, paymentMethod } = req.body;
+    let { addressId, paymentMethod, idempotencyKey } = req.body;
+    
+    // Generate idempotency key if not provided
+    if (!idempotencyKey) {
+      idempotencyKey = `${req.user.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    // Check if an order with this idempotencyKey already exists for this user
+    const existingOrder = await Order.findOne({ 
+      user: req.user.id, 
+      idempotencyKey 
+    }).session(session);
+    
+    if (existingOrder) {
+      await session.abortTransaction();
+      session.endSession();
+      return successResponse(res, 200, "Order created successfully", { order: existingOrder });
+    }
+
     if (!paymentMethod) {
       paymentMethod = "cod";
     }
 
     if (!["cod", "card", "online"].includes(paymentMethod)) {
+      await session.abortTransaction();
+      session.endSession();
       return errorResponse(res, 400, "Invalid payment method");
     }
 
     if (!addressId) {
+      await session.abortTransaction();
+      session.endSession();
       return errorResponse(res, 400, "Address ID is required");
     }
 
-    const address = await Address.findById(addressId);
+    const address = await Address.findById(addressId).session(session);
     if (!address || address.user.toString() !== req.user.id) {
+      await session.abortTransaction();
+      session.endSession();
       return errorResponse(res, 400, "Invalid address");
     }
 
-    const cart = await Cart.findOne({ user: req.user.id });
-    if (!cart || cart.items.length === 0) {
+    // Lock the cart to prevent concurrent checkouts
+    // Use findOneAndUpdate to atomically lock the cart
+    const cart = await Cart.findOneAndUpdate(
+      { 
+        user: req.user.id,
+        $or: [
+          { processingBy: null },
+          { processingBy: idempotencyKey },
+          // Allow retry if lock is older than 30 seconds (failed request recovery)
+          { processStartedAt: { $lt: new Date(Date.now() - 30000) } }
+        ]
+      },
+      { 
+        processingBy: idempotencyKey,
+        processStartedAt: new Date()
+      },
+      { new: true, session }
+    );
+
+    if (!cart) {
+      await session.abortTransaction();
+      session.endSession();
+      return errorResponse(res, 409, "Checkout already in progress. Please wait.");
+    }
+
+    if (!cart.items || cart.items.length === 0) {
+      // Unlock the cart
+      await Cart.updateOne(
+        { user: req.user.id },
+        { processingBy: null, processStartedAt: null },
+        { session }
+      );
+      await session.abortTransaction();
+      session.endSession();
       return errorResponse(res, 400, "Cart is empty");
     }
 
@@ -43,16 +103,40 @@ export const createOrder = async (req, res, next) => {
     let subtotal = 0;
 
     for (const item of cart.items) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(item.product).session(session);
       if (!product) {
+        // Unlock cart
+        await Cart.updateOne(
+          { user: req.user.id },
+          { processingBy: null, processStartedAt: null },
+          { session }
+        );
+        await session.abortTransaction();
+        session.endSession();
         return errorResponse(res, 400, `Product ${item.product} not found`);
       }
 
       if (!product.isActive) {
+        // Unlock cart
+        await Cart.updateOne(
+          { user: req.user.id },
+          { processingBy: null, processStartedAt: null },
+          { session }
+        );
+        await session.abortTransaction();
+        session.endSession();
         return errorResponse(res, 400, `Product ${product.name} is not active`);
       }
 
       if (product.stock < item.quantity) {
+        // Unlock cart
+        await Cart.updateOne(
+          { user: req.user.id },
+          { processingBy: null, processStartedAt: null },
+          { session }
+        );
+        await session.abortTransaction();
+        session.endSession();
         return errorResponse(res, 400, `Insufficient stock for ${product.name}`);
       }
 
@@ -70,27 +154,25 @@ export const createOrder = async (req, res, next) => {
       });
     }
 
-    // Deduct stock atomically and keep track for rollback if needed
-    const deductedItems = [];
-    try {
-      for (const item of orderItems) {
-        const updatedProduct = await Product.findOneAndUpdate(
-          { _id: item.product, stock: { $gte: item.quantity } },
-          { $inc: { stock: -item.quantity } },
-          { new: true }
-        );
+    // Deduct stock atomically within transaction
+    for (const item of orderItems) {
+      const updatedProduct = await Product.findOneAndUpdate(
+        { _id: item.product, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true, session }
+      );
 
-        if (!updatedProduct) {
-          throw new Error(`Insufficient stock for ${item.name} due to a concurrent checkout.`);
-        }
-        deductedItems.push(item);
+      if (!updatedProduct) {
+        // Unlock cart on failure
+        await Cart.updateOne(
+          { user: req.user.id },
+          { processingBy: null, processStartedAt: null },
+          { session }
+        );
+        await session.abortTransaction();
+        session.endSession();
+        return errorResponse(res, 400, `Insufficient stock for ${item.name} due to a concurrent checkout.`);
       }
-    } catch (err) {
-      // Rollback any successfully deducted items before failing
-      for (const item of deductedItems) {
-        await Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } });
-      }
-      return errorResponse(res, 400, err.message);
     }
 
     // Snapshot address
@@ -108,8 +190,10 @@ export const createOrder = async (req, res, next) => {
     const shippingFee = 0;
     const totalAmount = subtotal + shippingFee;
 
+    // Create order with idempotency key
     const order = new Order({
       user: req.user.id,
+      idempotencyKey,
       items: orderItems,
       shippingAddress,
       subtotal,
@@ -120,8 +204,9 @@ export const createOrder = async (req, res, next) => {
       orderStatus: "pending"
     });
 
-    await order.save();
+    await order.save({ session });
 
+    // Create payment record for non-card methods
     if (paymentMethod === "cod") {
       const payment = new Payment({
         order: order._id,
@@ -132,14 +217,28 @@ export const createOrder = async (req, res, next) => {
         currency: "PKR",
         status: "pending",
       });
-      await payment.save();
+      await payment.save({ session });
     }
 
-    cart.items = [];
-    await cart.save();
+    // Clear cart items and unlock
+    await Cart.updateOne(
+      { user: req.user.id },
+      { 
+        items: [],
+        processingBy: null,
+        processStartedAt: null
+      },
+      { session }
+    );
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
 
     return successResponse(res, 201, "Order created successfully", { order });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 };

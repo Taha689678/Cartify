@@ -25,7 +25,15 @@ const cartSchema = new mongoose.Schema({
     required: true,
     unique: true, // One cart per user
   },
-  items: [cartItemSchema]
+  items: [cartItemSchema],
+  processingBy: {
+    type: String, // idempotencyKey of the request currently processing this cart
+    default: null,
+  },
+  processStartedAt: {
+    type: Date,
+    default: null,
+  }
 }, {
   timestamps: true
 });
