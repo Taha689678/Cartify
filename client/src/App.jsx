@@ -1,9 +1,9 @@
-import { BrowserRouter as Router } from "react-router-dom";
+﻿import { BrowserRouter as Router } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import { WishlistProvider } from "./context/WishlistContext.jsx";
-import { Header } from "./components/layout/Header.jsx";
 import { AppRoutes } from "./routes/AppRoutes.jsx";
+import { ScrollToTop } from "./components/layout/ScrollToTop.jsx";
 
 function App() {
   return (
@@ -11,9 +11,8 @@ function App() {
       <CartProvider>
         <WishlistProvider>
           <Router>
-            <div className="flex flex-col min-h-screen">
-              {/* Temporary Tailwind test - remove after verification */}
-              <Header />
+            <ScrollToTop />
+            <div className="flex flex-col min-h-screen bg-gray-50">
               <main className="flex-grow">
                 <AppRoutes />
               </main>
