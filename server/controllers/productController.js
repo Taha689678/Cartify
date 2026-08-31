@@ -1,4 +1,4 @@
-﻿import mongoose from "mongoose";
+import mongoose from "mongoose";
 import Product  from "../models/Product.js";
 import Category from "../models/Category.js";
 import Seller   from "../models/Seller.js";
@@ -123,10 +123,15 @@ const getProducts = async (req, res, next) => {
 
     // Category filter
     if (req.query.category) {
-      if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
-        throw new ApiError(400, "Invalid category ID");
+      if (mongoose.Types.ObjectId.isValid(req.query.category)) {
+        filter.categories = req.query.category;
+      } else {
+        const categoryDoc = await Category.findOne({ slug: req.query.category, isActive: true }).select("_id").lean();
+        if (!categoryDoc) {
+          throw new ApiError(404, "Category not found");
+        }
+        filter.categories = categoryDoc._id;
       }
-      filter.categories = req.query.category;
     }
 
     // Seller filter

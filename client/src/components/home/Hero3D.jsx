@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, Suspense, lazy, Component } from "react";
+import { useState, useEffect, Suspense, lazy, Component } from "react";
 import { Loader2 } from "lucide-react";
 
 // Lazy load the actual 3D scene so Three.js isn't in the main bundle
@@ -24,21 +24,7 @@ class SceneErrorBoundary extends Component {
 }
 
 const StaticPreview = ({ subtitle }) => (
-  <div className="w-full h-[280px] md:h-[400px] relative rounded-2xl overflow-hidden border border-orange-100 shadow-inner">
-    <div
-      className="absolute inset-0"
-      style={{
-        background:
-          "radial-gradient(circle at 30% 30%, #FFF3E0, #FFE0B2 55%, #FFCCBC 100%)",
-      }}
-    />
-    <div
-      className="absolute inset-[-15%] rounded-full blur-3xl opacity-70"
-      style={{
-        background:
-          "radial-gradient(circle at 40% 35%, rgba(255,87,34,0.45), transparent 60%)",
-      }}
-    />
+  <div className="w-full h-[280px] md:h-[400px] relative rounded-2xl overflow-hidden">
     <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
       <div
         className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
@@ -84,7 +70,7 @@ export const Hero3D = () => {
   }
 
   return (
-    <div className="w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden bg-gradient-to-br from-orange-50 to-white border border-orange-100">
+    <div className="w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden">
       <SceneErrorBoundary
         fallback={<StaticPreview subtitle="Interactive view unavailable on this device" />}
       >

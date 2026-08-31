@@ -22,7 +22,7 @@ export const HomePage = () => {
   } = useProducts({ limit: 8, sort: 'best-selling' });
 
   return (
-    <div>
+    <div className="bg-[#EAEDED]">
       <Hero />
       <PromoCards />
       <CategoryStrip />
