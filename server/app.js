@@ -18,6 +18,8 @@ import sellerRoutes from "./routes/sellerRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import sellerApplicationRoutes from "./routes/sellerApplicationRoutes.js";
+import newsletterRoutes from "./routes/newsletterRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 
@@ -88,6 +90,8 @@ app.use("/api/seller",     sellerRoutes);
 app.use("/api/upload",     uploadRoutes);
 app.use("/api/admin",      adminRoutes);
 app.use("/api/seller-applications", sellerApplicationRoutes);
+app.use("/api/newsletter",  newsletterRoutes);
+app.use("/api/contact",     contactRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

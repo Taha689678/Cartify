@@ -373,8 +373,57 @@ const sendPasswordResetEmail = async (userOrPayload, token) => {
   await dispatch({ to, subject, text, html, label: "password reset" });
 };
 
+/**
+ * sendContactConfirmation({ name, email, subject }) - Send contact form confirmation
+ *
+ * @param {object} payload - { name, email, subject }
+ * @returns {Promise<void>}
+ */
+const sendContactConfirmation = async (payload) => {
+  const { name, email, subject } = payload;
+
+  if (!name || !email || !subject) {
+    throw new ApiError(400, "Name, email, and subject are required");
+  }
+
+  const safeName = escapeHtml(name);
+  const safeSubject = escapeHtml(subject);
+
+  const emailSubject = `We received your message — ${safeSubject}`;
+
+  const html = renderLayout({
+    preheader: "Thanks for contacting us. We'll be in touch soon.",
+    heading: "Message Received",
+    ctaLabel: "View our FAQ",
+    ctaUrl: process.env.CLIENT_URL || "http://localhost:5173",
+    bodyHtml: `
+      <p style="margin:0 0 14px;font-size:15px;color:${TEXT_COLOR};line-height:1.6;">Hi ${safeName},</p>
+      <p style="margin:0 0 14px;font-size:15px;color:${TEXT_COLOR};line-height:1.6;">Thank you for reaching out to us with your message about "<strong>${safeSubject}</strong>".</p>
+      <p style="margin:0;font-size:15px;color:${TEXT_COLOR};line-height:1.6;">We have received your inquiry and our team will review it shortly. We typically respond within 24-48 hours during business days.</p>`,
+    footerHtml: `
+      <p style="margin:0;font-size:12px;color:${MUTED_COLOR};line-height:1.6;">
+        In the meantime, feel free to check our <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/faq" style="color:${BRAND_COLOR};text-decoration:underline;">FAQ page</a> for quick answers to common questions.
+      </p>`,
+  });
+
+  const text = [
+    `Hi ${name},`,
+    "",
+    `Thank you for reaching out to us with your message about "${subject}".`,
+    "",
+    "We have received your inquiry and our team will review it shortly. We typically respond within 24-48 hours during business days.",
+    "",
+    "In the meantime, feel free to check our FAQ page for quick answers to common questions.",
+    "",
+    `— The ${APP_NAME} team`,
+  ].join("\n");
+
+  await dispatch({ to: email, subject: emailSubject, text, html, label: "contact confirmation" });
+};
+
 export default {
   sendVerificationEmail,
   resendVerificationEmail,
   sendPasswordResetEmail,
+  sendContactConfirmation,
 };

@@ -183,3 +183,43 @@ export const cancelOrder = async (req, res, next) => {
     next(error);
   }
 };
+export const trackOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return errorResponse(res, 400, "Order ID is required");
+    }
+    
+    // Using findById but need to handle invalid ID format gracefully
+    let order;
+    try {
+      order = await Order.findById(orderId).populate('items.product', 'name image slug');
+    } catch (e) {
+      return errorResponse(res, 404, "Invalid Order ID format");
+    }
+
+    if (!order) {
+      return errorResponse(res, 404, "Order not found");
+    }
+
+    // Return safe data without exposing user details if guest
+    const trackingData = {
+      _id: order._id,
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentStatus,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+      items: order.items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        itemStatus: item.itemStatus,
+        image: item.image
+      }))
+    };
+
+    return successResponse(res, 200, "Order tracking info retrieved", { order: trackingData });
+  } catch (error) {
+    next(error);
+  }
+};

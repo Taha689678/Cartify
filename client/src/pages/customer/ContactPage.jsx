@@ -1,18 +1,44 @@
 ﻿import React, { useState } from 'react';
 import { InfoPageLayout } from '../../components/common/InfoPageLayout.jsx';
-import { Mail, Phone, MapPin, Send, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { contactApi } from '../../api/contactApi.js';
 
 export const ContactPage = () => {
-  const [status, setStatus] = useState('idle'); // idle, loading, warning
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [status, setStatus] = useState('idle'); // idle, loading, success, error
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     
-    // Simulate network request then show unavailable state (no backend exists)
-    setTimeout(() => {
-      setStatus('warning');
-    }, 1200);
+    try {
+      await contactApi.submit(formData);
+      setStatus('success');
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
+      setTimeout(() => setStatus('idle'), 3000);
+    } catch (error) {
+      console.error('Failed to submit contact form:', error);
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 3000);
+    }
   };
 
   return (
@@ -71,34 +97,73 @@ export const ContactPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="John Doe" />
+              <input 
+                type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                placeholder="John Doe" 
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-              <input type="email" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="john@example.com" />
+              <input 
+                type="email" 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                placeholder="john@example.com" 
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-              <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="How can we help?" />
+              <input 
+                type="text" 
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                required 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                placeholder="How can we help?" 
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-              <textarea required rows="4" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none" placeholder="Write your message here..."></textarea>
+              <textarea 
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required 
+                rows="4" 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none" 
+                placeholder="Write your message here..."
+              ></textarea>
             </div>
 
-            {status === 'warning' && (
-              <div className="flex items-center gap-2 p-3 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-sm font-medium">
+            {status === 'error' && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 text-red-800 border border-red-200 rounded-lg text-sm font-medium">
                 <AlertCircle size={16} className="flex-shrink-0" />
-                <span>The message service is currently undergoing maintenance. Please email us directly.</span>
+                <span>Failed to send message. Please try again.</span>
+              </div>
+            )}
+
+            {status === 'success' && (
+              <div className="flex items-center gap-2 p-3 bg-green-50 text-green-800 border border-green-200 rounded-lg text-sm font-medium">
+                <CheckCircle2 size={16} className="flex-shrink-0" />
+                <span>Message sent successfully! We'll get back to you soon.</span>
               </div>
             )}
 
             <button 
               type="submit" 
-              disabled={status !== 'idle'}
+              disabled={status === 'loading'}
               className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
             >
               {status === 'loading' ? (

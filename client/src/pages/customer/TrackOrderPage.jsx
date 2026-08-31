@@ -1,23 +1,29 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { InfoPageLayout } from '../../components/common/InfoPageLayout.jsx';
-import { Search, Package, AlertCircle, ArrowRight } from 'lucide-react';
+import { Search, Package, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { orderApi } from '../../api/orderApi.js';
 
 export const TrackOrderPage = () => {
   const [orderId, setOrderId] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle, loading, error
 
-  const handleTrack = (e) => {
+  const [trackingData, setTrackingData] = useState(null);
+
+  const handleTrack = async (e) => {
     e.preventDefault();
     if (!orderId) return;
     
     setStatus('loading');
-    
-    // Simulate lookup without exposing real user data / building a new backend route
-    setTimeout(() => {
+    setTrackingData(null);
+    try {
+      const res = await orderApi.trackOrder(orderId);
+      setTrackingData(res.data.data.order);
+      setStatus('success');
+    } catch (err) {
       setStatus('error');
-    }, 1000);
+    }
   };
 
   return (
@@ -63,7 +69,29 @@ export const TrackOrderPage = () => {
           {status === 'error' && (
             <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium">
               <AlertCircle size={16} className="flex-shrink-0" />
-              <span>Public tracking is temporarily unavailable. Please log in to your account to view order details.</span>
+              <span>We couldn't find an order with that ID. Please check and try again.</span>
+            </div>
+          )}
+
+          {status === 'success' && trackingData && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+                <h3 className="font-bold text-gray-900">Order Status</h3>
+                <span className="px-3 py-1 bg-blue-50 text-blue-700 font-semibold text-sm rounded-full capitalize">
+                  {trackingData.orderStatus}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {trackingData.items.map((item, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <img src={item.image} alt={item.name} className="w-12 h-12 rounded object-cover border border-gray-100" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.name}</p>
+                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
