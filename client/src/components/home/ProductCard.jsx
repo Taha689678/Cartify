@@ -1,10 +1,11 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart, Eye, Star, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 
+const itemVariants = { hidden: { opacity: 0, y: 30, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 100, damping: 15 } } };
 export const ProductCard = ({ product }) => {
   const imageSrc = product.images && product.images.length > 0 ? product.images[0].url : null;
   const rating = product.rating || 0;
@@ -44,7 +45,8 @@ export const ProductCard = ({ product }) => {
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
+      variants={itemVariants}
+      whileHover={{ y: -6, scale: 1.01, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
       transition={{ duration: 0.3 }}
       className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group flex flex-col h-full relative"
     >
@@ -54,7 +56,7 @@ export const ProductCard = ({ product }) => {
             <img src={imageSrc} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-6xl text-gray-400">
-              📦
+              ðŸ“¦
             </div>
           )}
         </Link>
@@ -159,3 +161,4 @@ export const ProductCardSkeleton = () => {
     </div>
   );
 };
+

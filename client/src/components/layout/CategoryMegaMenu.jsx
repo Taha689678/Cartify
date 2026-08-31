@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Grid, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,7 +25,7 @@ export const CategoryMegaMenu = () => {
     <div className="relative hidden md:block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-medium px-4 py-2.5 rounded-xl hover:bg-gray-50 border border-gray-200"
+        className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-medium px-4 py-2.5 rounded-xl hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-gray-200 transition-all duration-300"
       >
         <Grid size={20} />
         <span>Categories</span>
@@ -92,3 +92,4 @@ export const CategoryMegaMenu = () => {
     </div>
   );
 };
+

@@ -1,39 +1,110 @@
-﻿import { useRef, useState, useEffect, Suspense, lazy } from "react";
+﻿import { useState, useEffect, Suspense, lazy, Component } from "react";
 import { Loader2 } from "lucide-react";
 
 // Lazy load the actual 3D scene so Three.js isn't in the main bundle
 const Scene = lazy(() => import("./Hero3DScene.jsx"));
 
+/**
+ * Catches WebGL/context-creation or Three.js runtime errors (e.g. an old
+ * GPU, a browser with WebGL disabled, or a driver crash) so a failure in
+ * the 3D scene degrades to the same static visual as mobile, rather than
+ * taking down the whole hero section with a blank white crash.
+ */
+class SceneErrorBoundary extends Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+const StaticPreview = ({ subtitle }) => (
+  <div className="w-full h-[280px] md:h-[400px] relative rounded-2xl overflow-hidden border border-orange-100 shadow-inner">
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          "radial-gradient(circle at 30% 30%, #FFF3E0, #FFE0B2 55%, #FFCCBC 100%)",
+      }}
+    />
+    <div
+      className="absolute inset-[-15%] rounded-full blur-3xl opacity-70"
+      style={{
+        background:
+          "radial-gradient(circle at 40% 35%, rgba(255,87,34,0.45), transparent 60%)",
+      }}
+    />
+    <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
+      <div
+        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+        style={{
+          background: "linear-gradient(135deg, #FF7043, #E64A19)",
+          transform: "rotate(12deg)",
+        }}
+      >
+        <span
+          className="font-bold text-xl text-white"
+          style={{ transform: "rotate(-12deg)" }}
+        >
+          3D
+        </span>
+      </div>
+      <div className="text-orange-900 font-medium">Interactive View</div>
+      <p className="text-orange-800/60 text-sm mt-1">{subtitle}</p>
+    </div>
+  </div>
+);
+
 export const Hero3D = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+  const [isSceneReady, setIsSceneReady] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window === "undefined") return;
+
+    // matchMedia only fires on actual breakpoint crossings, unlike a raw
+    // resize listener which fires continuously on every pixel of drag.
+    const mql = window.matchMedia("(max-width: 767px)");
+    const handleChange = (e) => setIsMobile(e.matches);
+
+    setIsMobile(mql.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
   }, []);
 
   if (isMobile) {
-    return (
-      <div className="w-full h-[280px] bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl flex flex-col items-center justify-center text-center p-6 shadow-inner">
-        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
-          <span className="font-bold text-xl">3D</span>
-        </div>
-        <div className="text-blue-800 font-medium">Interactive View</div>
-        <p className="text-blue-600/70 text-sm mt-1">Available on desktop screens</p>
-      </div>
-    );
+    return <StaticPreview subtitle="Available on desktop screens" />;
   }
 
   return (
-    <div className="w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
-      <Suspense fallback={
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-        </div>
-      }>
-        <Scene />
-      </Suspense>
+    <div className="w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden bg-gradient-to-br from-orange-50 to-white border border-orange-100">
+      <SceneErrorBoundary
+        fallback={<StaticPreview subtitle="Interactive view unavailable on this device" />}
+      >
+        <Suspense
+          fallback={
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 text-orange-600 animate-spin" />
+            </div>
+          }
+        >
+          {/* Fade the canvas in once mounted instead of popping in abruptly */}
+          <div
+            className={`w-full h-full transition-opacity duration-500 ${
+              isSceneReady ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Scene onReady={() => setIsSceneReady(true)} />
+          </div>
+        </Suspense>
+      </SceneErrorBoundary>
     </div>
   );
 };

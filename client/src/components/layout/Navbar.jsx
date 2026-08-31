@@ -48,7 +48,7 @@ export const Navbar = () => {
         className={`sticky top-0 z-40 transition-all duration-300 ${
           isScrolled
             ? "bg-white/90 backdrop-blur-md shadow-sm py-2"
-            : "bg-white py-3 border-b border-gray-100"
+            : "bg-white py-3 border-b border-gray-100 shadow-sm"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,13 +71,13 @@ export const Navbar = () => {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <Search size={24} />
               </button>
 
               {/* 4. Wishlist Icon */}
-              <Link to="/wishlist" className="relative p-2 text-gray-600 hover:text-red-500 transition-colors hidden sm:block">
+              <Link to="/wishlist" className="relative p-2 text-gray-600 hover:text-red-500 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 hidden sm:block">
                 <Heart size={24} />
                 {wishlistItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
@@ -87,7 +87,7 @@ export const Navbar = () => {
               </Link>
 
               {/* 5. Cart Icon */}
-              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300">
                 <ShoppingCart size={24} />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
@@ -102,7 +102,7 @@ export const Navbar = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors ml-1"
+                className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 ml-1"
               >
                 <Menu size={24} />
               </button>
@@ -137,5 +137,6 @@ export const Navbar = () => {
     </>
   );
 };
+
 
 

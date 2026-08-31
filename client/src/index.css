@@ -9,6 +9,18 @@
       scroll-behavior: auto;
     }
   }
+
+  /* Custom Cursor Hiding for non-touch devices */
+  @media (pointer: fine) {
+    body, a, button, [role="button"], select {
+      cursor: none !important;
+    }
+    
+    /* Preserve default cursor for inputs and text areas so text selection is natural */
+    input, textarea, [contenteditable="true"] {
+      cursor: text !important;
+    }
+  }
 }
 
 @layer utilities {

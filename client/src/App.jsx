@@ -4,6 +4,7 @@ import { CartProvider } from "./context/CartContext.jsx";
 import { WishlistProvider } from "./context/WishlistContext.jsx";
 import { AppRoutes } from "./routes/AppRoutes.jsx";
 import { ScrollToTop } from "./components/layout/ScrollToTop.jsx";
+import { CustomCursor } from "./components/layout/CustomCursor.jsx";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <WishlistProvider>
           <Router>
             <ScrollToTop />
+            <CustomCursor />
             <div className="flex flex-col min-h-screen bg-gray-50">
               <main className="flex-grow">
                 <AppRoutes />
@@ -25,3 +27,4 @@ function App() {
 }
 
 export default App;
+
