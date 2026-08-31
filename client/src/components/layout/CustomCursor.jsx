@@ -29,7 +29,7 @@ export const CustomCursor = () => {
     ).matches;
 
     // Higher = snappier ring, lower = longer/softer trail.
-    const EASE = prefersReducedMotion ? 1 : 0.22;
+    const EASE = prefersReducedMotion ? 1 : 0.5;
 
     const applyTransform = (el, x, y, extra = "") => {
       if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) ${extra}`;

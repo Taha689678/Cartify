@@ -1,5 +1,6 @@
 ﻿import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const PromoCards = () => {
   const cards = [
@@ -9,6 +10,7 @@ export const PromoCards = () => {
       description: "Discover our top-rated items",
       bgColor: "from-blue-500 to-blue-600",
       image: "🎁",
+      link: "/shop?sort=best-selling"
     },
     {
       id: 2,
@@ -16,6 +18,7 @@ export const PromoCards = () => {
       description: "Limited time offers available",
       bgColor: "from-purple-500 to-purple-600",
       image: "🏷️",
+      link: "/shop"
     },
   ];
 
@@ -43,9 +46,9 @@ export const PromoCards = () => {
                   <h3 className="text-3xl md:text-4xl font-bold mb-4">{card.title}</h3>
                   <p className="text-white/80 text-lg mb-8 max-w-xs">{card.description}</p>
                 </div>
-                <button className="self-start flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md px-6 py-3 rounded-full font-semibold transition-colors">
+                <Link to={card.link} className="self-start flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md px-6 py-3 rounded-full font-semibold transition-colors">
                   Shop Now <ArrowRight size={18} />
-                </button>
+                </Link>
               </div>
               <div className="absolute right-0 bottom-0 opacity-20 text-[150px] leading-none transform translate-x-4 translate-y-10 group-hover:scale-110 transition-transform duration-700">
                 {card.image}
@@ -57,4 +60,3 @@ export const PromoCards = () => {
     </section>
   );
 };
-
