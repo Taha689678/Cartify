@@ -14,11 +14,7 @@ function App() {
           <Router>
             <ScrollToTop />
             <CustomCursor />
-            <div className="flex flex-col min-h-screen bg-gray-50">
-              <main className="flex-grow">
-                <AppRoutes />
-              </main>
-            </div>
+            <AppRoutes />
           </Router>
         </WishlistProvider>
       </CartProvider>
@@ -27,4 +23,3 @@ function App() {
 }
 
 export default App;
-
