@@ -20,3 +20,6 @@ export const PromoBar = () => {
     </motion.div>
   );
 };
+
+
+
