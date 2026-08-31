@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+﻿import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleRoute } from "./RoleRoute.jsx";
 import { PublicRoute } from "./PublicRoute.jsx";
@@ -19,6 +19,8 @@ import { CookiePolicyPage } from "../pages/customer/CookiePolicyPage.jsx";
 import { CartPage } from "../pages/customer/CartPage.jsx";
 import { WishlistPage } from "../pages/customer/WishlistPage.jsx";
 import { ProfilePage } from "../pages/customer/ProfilePage.jsx";
+import { SettingsPage } from "../pages/customer/SettingsPage.jsx";
+import { PasswordSettingsPage } from "../pages/customer/PasswordSettingsPage.jsx";
 import { AddressesPage } from "../pages/customer/AddressesPage.jsx";
 import { OrdersPage } from "../pages/customer/OrdersPage.jsx";
 import { OrderDetailsPage } from "../pages/customer/OrderDetailsPage.jsx";
@@ -44,6 +46,7 @@ import { AdminLayout } from "../components/layout/AdminLayout.jsx";
 import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage.jsx";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage.jsx";
 import { AdminSellerApplicationsPage } from "../pages/admin/AdminSellerApplicationsPage.jsx";
+import { AdminSellersPage } from "../pages/admin/AdminSellersPage.jsx";
 import { BecomeSellerPage } from "../pages/customer/BecomeSellerPage.jsx";
 import { AdminProductsPage } from "../pages/admin/AdminProductsPage.jsx";
 import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage.jsx";
@@ -125,7 +128,9 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         >
-          <Route path="profile" element={<ProfilePage />} />
+<Route path="profile" element={<ProfilePage />} />
+<Route path="settings" element={<SettingsPage />} />
+<Route path="settings/password" element={<PasswordSettingsPage />} />
           <Route path="addresses" element={<AddressesPage />} />
           <Route path="become-seller" element={<BecomeSellerPage />} />
           <Route path="orders" element={<OrdersPage />} />
@@ -195,10 +200,8 @@ export const AppRoutes = () => {
       >
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
-        <Route
-          path="seller-applications"
-          element={<AdminSellerApplicationsPage />}
-        />
+        <Route path="seller-applications" element={<AdminSellerApplicationsPage />} />
+        <Route path="sellers" element={<AdminSellersPage />} />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
@@ -208,3 +211,6 @@ export const AppRoutes = () => {
     </Routes>
   );
 };
+
+
+

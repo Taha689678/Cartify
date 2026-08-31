@@ -1,6 +1,34 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sellerApi } from '../../api/sellerApi';
+import { productApi } from '../../api/productApi';
+
+const ProductLink = ({ productId, fallbackName }) => {
+  const [slug, setSlug] = React.useState(null);
+
+  React.useEffect(() => {
+    if (!productId) return;
+    productApi.getById(productId)
+      .then(res => {
+        if (res.data?.data?.product?.slug) {
+          setSlug(res.data.data.product.slug);
+        }
+      })
+      .catch(() => {
+        // Fallback or ignore if product is deleted/inactive
+      });
+  }, [productId]);
+
+  if (!slug) {
+    return <span className="font-medium text-gray-700 line-clamp-1">{fallbackName}</span>;
+  }
+
+  return (
+    <Link to={/product/ + slug} className="font-medium hover:text-blue-600 line-clamp-1">
+      {fallbackName}
+    </Link>
+  );
+};
 
 export const SellerOrderDetailsPage = () => {
   const { id } = useParams();
@@ -133,19 +161,17 @@ export const SellerOrderDetailsPage = () => {
           {order.items?.map((item) => (
             <div key={item._id} className="p-4 flex flex-col sm:flex-row items-center gap-4">
               <div className="w-16 h-16 bg-gray-100 rounded flex-shrink-0">
-                {item.product?.images?.[0] ? (
-                  <img src={item.product.images[0].url || item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover rounded" />
+                {item.image ? (
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No img</div>
                 )}
               </div>
               
               <div className="flex-1">
-                <Link to={`/products/${item.product?._id}`} className="font-medium hover:text-blue-600 line-clamp-1">
-                  {item.product?.name || 'Unknown Product'}
-                </Link>
+                <ProductLink productId={item.product} fallbackName={item.name || "Unknown Product"} />
                 <div className="text-sm text-gray-500 mt-1">
-                  Qty: {item.quantity} × ${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
+                  Qty: {item.quantity} Ã— ${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
                 </div>
               </div>
               
@@ -172,3 +198,4 @@ export const SellerOrderDetailsPage = () => {
     </div>
   );
 };
+

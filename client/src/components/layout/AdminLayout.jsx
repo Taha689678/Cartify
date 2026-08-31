@@ -1,9 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
   Store,
+  BadgeCheck,
   Package,
   Tags,
   ShoppingCart,
@@ -24,7 +25,8 @@ export const AdminLayout = () => {
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Applications", href: "/admin/seller-applications", icon: Store },
+    { name: "Sellers", href: "/admin/sellers", icon: Store },
+    { name: "Applications", href: "/admin/seller-applications", icon: BadgeCheck },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Categories", href: "/admin/categories", icon: Tags },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
@@ -147,3 +149,4 @@ export const AdminLayout = () => {
     </div>
   );
 };
+
