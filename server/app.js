@@ -25,11 +25,13 @@ const app = express();
 
 const configuredFrontendUrl =
   process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:5173";
-const allowedFrontendUrls = new Set([
-  configuredFrontendUrl,
-  "http://localhost:5173",
-  "http://localhost:5174",
-]);
+
+const allowedFrontendUrls = new Set([configuredFrontendUrl]);
+
+if (process.env.NODE_ENV !== "production") {
+  allowedFrontendUrls.add("http://localhost:5173");
+  allowedFrontendUrls.add("http://localhost:5174");
+}
 
 app.use(
   cors({

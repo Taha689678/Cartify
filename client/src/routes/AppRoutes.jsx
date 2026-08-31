@@ -1,4 +1,4 @@
-﻿import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleRoute } from "./RoleRoute.jsx";
@@ -55,6 +55,7 @@ const BecomeSellerPage = lazy(() => import("../pages/customer/BecomeSellerPage.j
 const AdminProductsPage = lazy(() => import("../pages/admin/AdminProductsPage.jsx").then(m => ({ default: m.AdminProductsPage })));
 const AdminCategoriesPage = lazy(() => import("../pages/admin/AdminCategoriesPage.jsx").then(m => ({ default: m.AdminCategoriesPage })));
 const AdminOrdersPage = lazy(() => import("../pages/admin/AdminOrdersPage.jsx").then(m => ({ default: m.AdminOrdersPage })));
+const AdminOrderDetailsPage = lazy(() => import("../pages/admin/AdminOrderDetailsPage.jsx").then(m => ({ default: m.AdminOrderDetailsPage })));
 const AdminReviewsPage = lazy(() => import("../pages/admin/AdminReviewsPage.jsx").then(m => ({ default: m.AdminReviewsPage })));
 
 const PageLoader = () => (
@@ -168,6 +169,7 @@ export const AppRoutes = () => {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
         </Route>
       </Routes>
