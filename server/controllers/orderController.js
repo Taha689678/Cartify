@@ -70,11 +70,27 @@ export const createOrder = async (req, res, next) => {
       });
     }
 
-    // Deduct stock
-    for (const item of orderItems) {
-      const product = await Product.findById(item.product);
-      product.stock -= item.quantity;
-      await product.save();
+    // Deduct stock atomically and keep track for rollback if needed
+    const deductedItems = [];
+    try {
+      for (const item of orderItems) {
+        const updatedProduct = await Product.findOneAndUpdate(
+          { _id: item.product, stock: { $gte: item.quantity } },
+          { $inc: { stock: -item.quantity } },
+          { new: true }
+        );
+
+        if (!updatedProduct) {
+          throw new Error(`Insufficient stock for ${item.name} due to a concurrent checkout.`);
+        }
+        deductedItems.push(item);
+      }
+    } catch (err) {
+      // Rollback any successfully deducted items before failing
+      for (const item of deductedItems) {
+        await Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } });
+      }
+      return errorResponse(res, 400, err.message);
     }
 
     // Snapshot address
