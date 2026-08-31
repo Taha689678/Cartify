@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, Heart, User, LogOut, Package, LayoutDashboard, Grid, MapPin } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -53,7 +53,7 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
             ) : user ? (
               <div className="p-4 bg-gray-50 border-b border-gray-100">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
                     {user.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="overflow-hidden">
@@ -62,7 +62,7 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                   </div>
                 </div>
                 {isSeller && sellerStatus === "approved" && (
-                  <Link to="/seller/dashboard" onClick={onClose} className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700">
+                  <Link to="/seller/dashboard" onClick={onClose} className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700">
                     <LayoutDashboard size={14} /> Seller Dashboard
                   </Link>
                 )}
@@ -72,7 +72,7 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                 <Link
                   to="/login"
                   onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-sm shadow-blue-200"
+                  className="w-full flex items-center justify-center gap-2 bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 shadow-sm shadow-orange-200"
                 >
                   <User size={18} /> Login or Register
                 </Link>
@@ -101,12 +101,12 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                       key={cat._id}
                       to={`/shop?category=${cat.slug}`}
                       onClick={onClose}
-                      className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-orange-600"
                     >
                       {cat.image ? (
                         <img src={cat.image} alt="" className="w-6 h-6 rounded object-cover" />
                       ) : (
-                        <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs">📦</div>
+                        <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs">ðŸ“¦</div>
                       )}
                       {cat.name}
                     </Link>
@@ -124,7 +124,7 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                   </Link>
                   <Link to="/cart" onClick={onClose} className="flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
                     <div className="flex items-center gap-3"><ShoppingBag size={18} /> Cart</div>
-                    {cartItemCount > 0 && <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">{cartItemCount}</span>}
+                    {cartItemCount > 0 && <span className="bg-orange-600 text-white text-xs px-2 py-0.5 rounded-full">{cartItemCount}</span>}
                   </Link>
                   <Link to="/wishlist" onClick={onClose} className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
                     <Heart size={18} /> Wishlist
@@ -159,3 +159,4 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
     </>
   );
 };
+

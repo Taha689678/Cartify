@@ -5,9 +5,8 @@ export const CustomCursor = () => {
   const ringRef = useRef(null);
   const dotRef = useRef(null);
 
-  // Actual pointer position (updates instantly on every mousemove)
+  // Raw coordinates
   const targetPos = useRef({ x: 0, y: 0 });
-  // Ring position (eases toward targetPos every frame, giving it a soft trail)
   const ringPos = useRef({ x: 0, y: 0 });
   const rafId = useRef(null);
 
@@ -17,104 +16,102 @@ export const CustomCursor = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (
-      typeof window === "undefined" ||
-      window.matchMedia("(pointer: coarse)").matches
-    ) {
-      return;
-    }
+    if (typeof window === "undefined" || window.matchMedia("(pointer: coarse)").matches) return;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    // Higher = snappier ring, lower = longer/softer trail.
-    const EASE = prefersReducedMotion ? 1 : 0.5;
-
-    const applyTransform = (el, x, y, extra = "") => {
-      if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) ${extra}`;
-    };
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const EASE = prefersReducedMotion ? 1 : 0.35; // 0.35 is buttery smooth without lagging behind too much
 
     const tick = () => {
       ringPos.current.x += (targetPos.current.x - ringPos.current.x) * EASE;
       ringPos.current.y += (targetPos.current.y - ringPos.current.y) * EASE;
-      applyTransform(ringRef.current, ringPos.current.x, ringPos.current.y);
+      
+      // We directly mutate the DOM styles. 
+      // Do NOT use CSS transitions on transform, as it fights with requestAnimationFrame and causes lag/stutter!
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${ringPos.current.x}px, ${ringPos.current.y}px, 0) translate(-50%, -50%)`;
+      }
+      
       rafId.current = requestAnimationFrame(tick);
     };
     rafId.current = requestAnimationFrame(tick);
 
     const onMouseMove = (e) => {
       targetPos.current = { x: e.clientX, y: e.clientY };
-      applyTransform(dotRef.current, e.clientX, e.clientY);
-      setIsVisible((v) => (v ? v : true));
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+      }
+      setIsVisible(true);
     };
 
-    const onMouseLeaveWindow = () => setIsVisible(false);
-    const onMouseEnterWindow = () => setIsVisible(true);
+    const onMouseLeave = () => setIsVisible(false);
+    const onMouseEnter = () => setIsVisible(true);
+
     const onMouseDown = () => setIsPressed(true);
     const onMouseUp = () => setIsPressed(false);
 
     const onMouseOver = (e) => {
       const target = e.target;
-      const isClickable =
-        target.closest("a, button, select, [role='button'], [data-cursor-hover]") !== null ||
-        window.getComputedStyle(target).cursor === "pointer";
-
-      setIsHovering(isClickable);
+      const isClickable = 
+        target.tagName.toLowerCase() === 'a' ||
+        target.tagName.toLowerCase() === 'button' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        window.getComputedStyle(target).cursor === 'pointer';
+        
+      if (isClickable && !isHovering) setIsHovering(true);
+      else if (!isClickable && isHovering) setIsHovering(false);
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
-    document.addEventListener("mouseleave", onMouseLeaveWindow);
-    document.addEventListener("mouseenter", onMouseEnterWindow);
+    document.addEventListener("mouseleave", onMouseLeave);
+    document.addEventListener("mouseenter", onMouseEnter);
+    document.addEventListener("mousedown", onMouseDown, { passive: true });
+    document.addEventListener("mouseup", onMouseUp, { passive: true });
     document.addEventListener("mouseover", onMouseOver, { passive: true });
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mouseup", onMouseUp);
 
     return () => {
       cancelAnimationFrame(rafId.current);
       window.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseleave", onMouseLeaveWindow);
-      document.removeEventListener("mouseenter", onMouseEnterWindow);
+      document.removeEventListener("mouseleave", onMouseLeave);
+      document.removeEventListener("mouseenter", onMouseEnter);
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mouseover", onMouseOver);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
     };
-  }, []);
+  }, [isHovering]);
 
   useEffect(() => {
     setIsHovering(false);
     setIsPressed(false);
   }, [location.pathname]);
 
-  if (
-    typeof window !== "undefined" &&
-    window.matchMedia("(pointer: coarse)").matches
-  ) {
+  if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
     return null;
   }
 
+  // We rely purely on width/height/opacity CSS transitions.
+  // We omit `style={{}}` to prevent React from wiping our inline `transform` during re-renders (which caused the "1 inch jump").
   return (
     <>
-      {/* Trailing ring — eases toward the pointer for a soft, smooth follow */}
       <div
         ref={ringRef}
-        className={`fixed top-0 left-0 pointer-events-none z-[100] rounded-full border-2 border-orange-500 transition-[width,height,opacity,background-color] duration-300 ease-out ${
+        className={`fixed top-0 left-0 pointer-events-none z-[100] rounded-full border-2 border-orange-500 will-change-transform transition-[width,height,opacity,background-color] duration-150 ease-out ${
           isVisible ? "opacity-100" : "opacity-0"
         } ${
-          isHovering
-            ? "w-12 h-12 bg-orange-500/10"
-            : "w-8 h-8 bg-transparent"
-        } ${isPressed ? "scale-90" : "scale-100"}`}
-        style={{ willChange: "transform", transitionProperty: "width, height, opacity, background-color, transform" }}
+          isPressed 
+            ? "w-7 h-7 bg-orange-500/30" 
+            : isHovering
+              ? "w-12 h-12 bg-orange-500/10"
+              : "w-8 h-8 bg-transparent"
+        }`}
       />
-
-      {/* Precise dot — tracks the raw pointer position with zero lag */}
       <div
         ref={dotRef}
-        className={`fixed top-0 left-0 pointer-events-none z-[100] rounded-full bg-orange-600 transition-[opacity,transform] duration-150 ease-out ${
+        className={`fixed top-0 left-0 pointer-events-none z-[100] rounded-full bg-orange-600 will-change-transform transition-[width,height,opacity] duration-100 ease-out ${
           isVisible && !isHovering ? "opacity-100" : "opacity-0"
-        } ${isPressed ? "scale-150" : "scale-100"}`}
-        style={{ width: 6, height: 6, willChange: "transform" }}
+        } ${
+          isPressed ? "w-2 h-2" : "w-1.5 h-1.5"
+        }`}
       />
     </>
   );

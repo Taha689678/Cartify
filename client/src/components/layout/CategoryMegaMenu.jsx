@@ -25,7 +25,7 @@ export const CategoryMegaMenu = () => {
     <div className="relative hidden md:block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-medium px-4 py-2.5 rounded-xl hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-gray-200 transition-all duration-300"
+        className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors font-medium px-4 py-2.5 rounded-xl hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-gray-200 transition-all duration-300"
       >
         <Grid size={20} />
         <span>Categories</span>
@@ -55,18 +55,18 @@ export const CategoryMegaMenu = () => {
                   key={cat._id}
                   to={`/shop?category=${cat.slug}`}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-blue-50 group transition-colors"
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-orange-50 group transition-colors"
                 >
-                  <div className="w-10 h-10 bg-gray-50 group-hover:bg-white rounded-lg flex items-center justify-center border border-gray-100 group-hover:border-blue-100 group-hover:shadow-sm transition-all overflow-hidden text-2xl">
+                  <div className="w-10 h-10 bg-gray-50 group-hover:bg-white rounded-lg flex items-center justify-center border border-gray-100 group-hover:border-orange-100 group-hover:shadow-sm transition-all overflow-hidden text-2xl">
                     {cat.image?.url ? (
                       <img src={cat.image.url} alt={cat.name} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-lg font-bold text-gray-400 group-hover:text-blue-500">
+                      <span className="text-lg font-bold text-gray-400 group-hover:text-orange-500">
                         {cat.name.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <span className="font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
+                  <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
                     {cat.name}
                   </span>
                 </Link>
@@ -81,7 +81,7 @@ export const CategoryMegaMenu = () => {
               <Link
                 to="/shop"
                 onClick={() => setIsOpen(false)}
-                className="text-blue-600 hover:text-blue-700 font-medium text-sm flex justify-center w-full hover:underline"
+                className="text-orange-600 hover:text-orange-700 font-medium text-sm flex justify-center w-full hover:underline"
               >
                 Browse All Categories & Products &rarr;
               </Link>
@@ -92,4 +92,5 @@ export const CategoryMegaMenu = () => {
     </div>
   );
 };
+
 

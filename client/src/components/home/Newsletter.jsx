@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Mail, CheckCircle } from "lucide-react";
+﻿import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, CheckCircle, ArrowRight } from "lucide-react";
 
 export const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -16,42 +16,66 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-blue-600">
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-        <p className="text-blue-100 mb-8">
+    <motion.section 
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-orange-500 to-orange-700 relative overflow-hidden"
+    >
+      {/* Decorative radial glows */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-900/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none" />
+      
+      <div className="max-w-3xl mx-auto text-center relative z-10">
+        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stay Updated</h2>
+        <p className="text-orange-100 mb-10 text-lg">
           Subscribe to our newsletter for exclusive offers and new product updates.
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-          <div className="flex-grow relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto relative p-1 bg-white/10 backdrop-blur-sm rounded-full shadow-xl border border-white/20">
+          <div className="flex-grow relative flex items-center">
+            <Mail className="absolute left-6 text-white/70" size={20} />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
+              className="w-full pl-14 pr-6 py-4 rounded-full bg-transparent text-white placeholder-orange-100/70 focus:outline-none focus:ring-0 text-base"
               required
             />
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
+          <button
             type="submit"
-            className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap"
+            className="flex-shrink-0 bg-gray-900 text-white px-8 py-4 sm:py-0 rounded-full font-semibold hover:bg-black transition-all shadow-md active:scale-95 flex items-center justify-center min-w-[160px]"
           >
-            {isSubmitted ? (
-              <span className="flex items-center gap-2">
-                <CheckCircle size={20} />
-                Subscribed!
-              </span>
-            ) : (
-              "Get Updates"
-            )}
-          </motion.button>
+            <AnimatePresence mode="wait">
+              {isSubmitted ? (
+                <motion.span 
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-2"
+                >
+                  <CheckCircle size={20} className="text-green-400" />
+                  Subscribed!
+                </motion.span>
+              ) : (
+                <motion.span 
+                  key="default"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-2"
+                >
+                  Get Updates <ArrowRight size={18} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
         </form>
       </div>
-    </section>
+    </motion.section>
   );
 };

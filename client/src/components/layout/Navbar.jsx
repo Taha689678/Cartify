@@ -71,7 +71,7 @@ export const Navbar = () => {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
+                className="md:hidden p-2 text-gray-600 hover:text-orange-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <Search size={24} />
               </button>
@@ -87,10 +87,10 @@ export const Navbar = () => {
               </Link>
 
               {/* 5. Cart Icon */}
-              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300">
+              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-orange-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300">
                 <ShoppingCart size={24} />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                  <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </span>
                 )}
@@ -102,7 +102,7 @@ export const Navbar = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 ml-1"
+                className="md:hidden p-2 text-gray-600 hover:text-orange-600 hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 ml-1"
               >
                 <Menu size={24} />
               </button>
@@ -118,7 +118,7 @@ export const Navbar = () => {
                   placeholder="Search products..."
                   value={mobileSearchTerm}
                   onChange={(e) => setMobileSearchTerm(e.target.value)}
-                  className="w-full pl-4 pr-10 py-2.5 bg-gray-100 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  className="w-full pl-4 pr-10 py-2.5 bg-gray-100 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white"
                   autoFocus
                 />
                 <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -137,6 +137,7 @@ export const Navbar = () => {
     </>
   );
 };
+
 
 
 
