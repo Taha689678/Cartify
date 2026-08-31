@@ -113,40 +113,61 @@ const loadMailer = async () => {
 const getTransporter = async () => {
   if (cachedTransporter) return cachedTransporter;
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT);
-  const user = process.env.SMTP_USER;
-  // SMTP_PASSWORD is the documented name; SMTP_PASS accepted as an alias.
-  const password = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
-
-  const missing = [];
-  if (!host) missing.push("SMTP_HOST");
-  if (!port) missing.push("SMTP_PORT");
-  if (!user) missing.push("SMTP_USER");
-  if (!password) missing.push("SMTP_PASSWORD");
-  if (missing.length > 0) failConfiguration(missing);
-
+  const provider = process.env.EMAIL_PROVIDER || "mailtrap";
   const nodemailer = await loadMailer();
 
-  // Implicit TLS on 465; STARTTLS elsewhere. Override with SMTP_SECURE.
-  const secure =
-    process.env.SMTP_SECURE !== undefined
-      ? process.env.SMTP_SECURE === "true"
-      : port === 465;
+  if (provider === "gmail") {
+    const user = process.env.GMAIL_USER;
+    const pass = process.env.GMAIL_APP_PASSWORD;
 
-  cachedTransporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: { user, pass: password },
-  });
+    const missing = [];
+    if (!user) missing.push("GMAIL_USER");
+    if (!pass) missing.push("GMAIL_APP_PASSWORD");
+    if (missing.length > 0) failConfiguration(missing);
+
+    cachedTransporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: { user, pass },
+    });
+  } else {
+    const host = process.env.SMTP_HOST;
+    const port = Number(process.env.SMTP_PORT);
+    const user = process.env.SMTP_USER;
+    // SMTP_PASSWORD is the documented name; SMTP_PASS accepted as an alias.
+    const password = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+
+    const missing = [];
+    if (!host) missing.push("SMTP_HOST");
+    if (!port) missing.push("SMTP_PORT");
+    if (!user) missing.push("SMTP_USER");
+    if (!password) missing.push("SMTP_PASSWORD");
+    if (missing.length > 0) failConfiguration(missing);
+
+    // Implicit TLS on 465; STARTTLS elsewhere. Override with SMTP_SECURE.
+    const secure =
+      process.env.SMTP_SECURE !== undefined
+        ? process.env.SMTP_SECURE === "true"
+        : port === 465;
+
+    cachedTransporter = nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass: password },
+    });
+  }
 
   return cachedTransporter;
 };
 
-/** Resolves the From header. Falls back to SMTP_USER when EMAIL_FROM is unset. */
+/** Resolves the From header. Falls back to provider user when EMAIL_FROM is unset. */
 const getFromAddress = () => {
-  const configured = process.env.EMAIL_FROM || process.env.SMTP_USER;
+  const provider = process.env.EMAIL_PROVIDER || "mailtrap";
+  const defaultUser = provider === "gmail" ? process.env.GMAIL_USER : process.env.SMTP_USER;
+  const configured = process.env.EMAIL_FROM || defaultUser;
+  
   if (!configured) failConfiguration(["EMAIL_FROM"]);
 
   // Already formatted as `Name <addr>`? Leave it alone.
