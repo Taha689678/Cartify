@@ -1,4 +1,4 @@
-import Seller from "../models/Seller.js";
+import Seller from "../models/seller.js";
 import ApiError from "../utils/apiError.js";
 
 /**

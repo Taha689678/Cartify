@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import User from "../models/User.js";
+import User from "../models/user.js";
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
 import Review from "../models/Review.js";
 import Category from "../models/Category.js";
-import Seller from "../models/Seller.js";
+import Seller from "../models/seller.js";
 import Payment from "../models/Payment.js";
 import ApiError from "../utils/apiError.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";

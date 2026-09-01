@@ -1,9 +1,9 @@
 ﻿import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
-import User from "../models/User.js";
+import User from "../models/user.js";
 import Session from "../models/Session.js";
-import Seller from "../models/Seller.js";
+import Seller from "../models/seller.js";
 import tokenService from "./tokenService.js";
 import emailService from "./emailService.js";
 import hashToken from "../utils/hashToken.js";

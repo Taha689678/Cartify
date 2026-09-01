@@ -1,6 +1,6 @@
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
-import Seller from "../models/Seller.js";
+import Seller from "../models/seller.js";
 import ApiError from "../utils/apiError.js";
 import { successResponse } from "../utils/apiResponse.js";
 

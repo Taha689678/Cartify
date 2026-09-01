@@ -1,4 +1,4 @@
-import Seller from "../models/Seller.js";
+import Seller from "../models/seller.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 import slugify from "slugify";
 
