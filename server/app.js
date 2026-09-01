@@ -24,8 +24,14 @@ import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 
-const configuredFrontendUrl =
-  process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:5173";
+// Trust proxy is required because Back4app runs behind a reverse proxy.
+// This allows express-rate-limit to read the X-Forwarded-For header properly.
+app.set("trust proxy", 1);
+
+// Normalize the frontend URL to ensure no trailing slash causes CORS mismatch
+const configuredFrontendUrl = (
+  process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:5173"
+).replace(/\/$/, "");
 
 const allowedFrontendUrls = new Set([configuredFrontendUrl]);
 
@@ -37,7 +43,9 @@ if (process.env.NODE_ENV !== "production") {
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedFrontendUrls.has(origin)) {
+      // Normalize incoming origin just in case
+      const normalizedOrigin = origin ? origin.replace(/\/$/, "") : null;
+      if (!normalizedOrigin || allowedFrontendUrls.has(normalizedOrigin)) {
         return callback(null, true);
       }
 
