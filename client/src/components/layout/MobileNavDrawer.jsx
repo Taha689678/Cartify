@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, Heart, User, LogOut, Package, LayoutDashboard, Grid, MapPin } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -103,10 +103,12 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                       onClick={onClose}
                       className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-orange-600"
                     >
-                      {cat.image ? (
-                        <img src={cat.image} alt="" className="w-6 h-6 rounded object-cover" />
+                      {cat.image?.url || (typeof cat.image === 'string' && cat.image) ? (
+                        <img src={cat.image?.url || cat.image} alt="" className="w-6 h-6 rounded object-cover" />
                       ) : (
-                        <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs">ðŸ“¦</div>
+                        <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                          {cat.name.charAt(0)}
+                        </div>
                       )}
                       {cat.name}
                     </Link>
