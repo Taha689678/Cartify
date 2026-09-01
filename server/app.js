@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 
 import authRoutes from "./routes/authRoutes.js";
@@ -51,6 +52,7 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
+app.use(mongoSanitize());
 
 import rateLimit from "express-rate-limit";
 const apiLimiter = rateLimit({
