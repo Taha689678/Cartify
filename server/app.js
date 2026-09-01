@@ -52,7 +52,18 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(mongoSanitize());
+
+// Express 5+ compatibility for express-mongo-sanitize
+// req.body, req.query, req.params are getters in Express 5 and cannot be reassigned.
+// We call sanitize to mutate the objects in-place instead of reassigning them.
+app.use((req, res, next) => {
+  ["body", "params", "headers", "query"].forEach((key) => {
+    if (req[key]) {
+      mongoSanitize.sanitize(req[key]);
+    }
+  });
+  next();
+});
 
 import rateLimit from "express-rate-limit";
 const apiLimiter = rateLimit({
