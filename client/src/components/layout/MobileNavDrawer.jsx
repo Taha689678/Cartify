@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, Heart, User, LogOut, Package, LayoutDashboard, Grid, MapPin } from "lucide-react";
+import { X, ShoppingBag, Heart, User, LogOut, Package, LayoutDashboard, Grid, MapPin, Store, FileText } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { useCategories } from "../../hooks/useCategories.js";
@@ -61,11 +61,28 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                 </div>
-                {isSeller && sellerStatus === "approved" && (
-                  <Link to="/seller/dashboard" onClick={onClose} className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700">
-                    <LayoutDashboard size={14} /> Seller Dashboard
-                  </Link>
-                )}
+                <div className="flex flex-col gap-2 mt-3">
+                  {user.role === "admin" && (
+                    <Link to="/admin/dashboard" onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 w-fit">
+                      <LayoutDashboard size={14} /> Admin Panel
+                    </Link>
+                  )}
+                  {isSeller && sellerStatus === "approved" && (
+                    <Link to="/seller/dashboard" onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 w-fit">
+                      <LayoutDashboard size={14} /> Seller Dashboard
+                    </Link>
+                  )}
+                  {isSeller && sellerStatus !== "approved" && (
+                    <Link to="/become-seller" onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-100 hover:bg-amber-100 w-fit">
+                      <FileText size={14} /> Seller App: {sellerStatus.charAt(0).toUpperCase() + sellerStatus.slice(1)}
+                    </Link>
+                  )}
+                  {!isSeller && user.role === "customer" && (
+                    <Link to="/become-seller" onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 bg-orange-50 text-orange-600 text-xs font-bold rounded-lg border border-orange-100 hover:bg-orange-100 w-fit">
+                      <Store size={14} /> Become a Seller
+                    </Link>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="p-4 border-b border-gray-100">
