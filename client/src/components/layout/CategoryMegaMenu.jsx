@@ -7,9 +7,10 @@ import { useCategories } from "../../hooks/useCategories.js";
 export const CategoryMegaMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  
+
   // Use the existing hook to fetch categories automatically
   const { categories, loading } = useCategories({ limit: 12 });
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
