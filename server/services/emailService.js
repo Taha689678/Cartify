@@ -95,7 +95,7 @@ const buildActionUrl = (path, token) => {
 // Created once, on first send, then reused — a new SMTP connection pool per
 // email would be wasteful. Holds configuration only; no tokens, no messages.
 let cachedTransporter = null;
-
+let cachedResendClient = null;
 
 const loadMailer = async () => {
   try {
@@ -104,6 +104,18 @@ const loadMailer = async () => {
   } catch (error) {
     console.error(
       "emailService: the 'nodemailer' package is not installed — email cannot be sent until it is added as a dependency"
+    );
+    throw new ApiError(500, "Email service is unavailable", []);
+  }
+};
+
+const loadResend = async () => {
+  try {
+    const { Resend } = await import("resend");
+    return Resend;
+  } catch (error) {
+    console.error(
+      "emailService: the 'resend' package is not installed — run: npm install resend"
     );
     throw new ApiError(500, "Email service is unavailable", []);
   }
@@ -162,10 +174,27 @@ const getTransporter = async () => {
   return cachedTransporter;
 };
 
+/** Returns the Resend client, creating it on first call. */
+const getResendClient = async () => {
+  if (cachedResendClient) return cachedResendClient;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) failConfiguration(["RESEND_API_KEY"]);
+
+  const Resend = await loadResend();
+  cachedResendClient = new Resend(apiKey);
+  return cachedResendClient;
+};
+
 /** Resolves the From header. Falls back to provider user when EMAIL_FROM is unset. */
 const getFromAddress = () => {
   const provider = process.env.EMAIL_PROVIDER || "mailtrap";
-  const defaultUser = provider === "gmail" ? process.env.GMAIL_USER : process.env.SMTP_USER;
+
+  let defaultUser;
+  if (provider === "gmail") defaultUser = process.env.GMAIL_USER;
+  else if (provider === "resend") defaultUser = process.env.RESEND_FROM || "onboarding@resend.dev";
+  else defaultUser = process.env.SMTP_USER;
+
   const configured = process.env.EMAIL_FROM || defaultUser;
   
   if (!configured) failConfiguration(["EMAIL_FROM"]);
@@ -176,6 +205,34 @@ const getFromAddress = () => {
 
 
 const dispatch = async ({ to, subject, text, html, label }) => {
+  const provider = process.env.EMAIL_PROVIDER || "mailtrap";
+
+  if (provider === "resend") {
+    // Use Resend HTTP API — bypasses SMTP firewall restrictions on Render
+    const resend = await getResendClient();
+    const from = getFromAddress();
+
+    try {
+      const { error } = await resend.emails.send({ from, to, subject, text, html });
+      if (error) {
+        console.error(`emailService: Resend rejected ${label} email`, error);
+        const failure = new ApiError(502, "Unable to send email at this time");
+        failure.cause = error;
+        throw failure;
+      }
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      console.error(`emailService: failed to send ${label} email via Resend`, {
+        message: error?.message,
+      });
+      const failure = new ApiError(502, "Unable to send email at this time");
+      failure.cause = error;
+      throw failure;
+    }
+    return;
+  }
+
+  // SMTP path (gmail, mailtrap, custom SMTP)
   const transporter = await getTransporter();
   const from = getFromAddress();
 
