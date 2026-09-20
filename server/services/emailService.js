@@ -127,8 +127,8 @@ const getTransporter = async () => {
 
     cachedTransporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: { user, pass },
     });
   } else {
